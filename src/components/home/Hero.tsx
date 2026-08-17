@@ -64,6 +64,7 @@ export default function Hero() {
       const eyebrow = root.querySelector("[data-hero-eyebrow]");
       const support = root.querySelector("[data-hero-support]");
       const cta = root.querySelector("[data-hero-cta]");
+      const secondary = root.querySelector("[data-hero-secondary]");
       const cue = root.querySelector("[data-hero-cue]");
 
       // One master timeline — the ENTIRE entrance completes ~1.7s after the
@@ -118,12 +119,18 @@ export default function Hero() {
         1.15,
       );
 
-      // 06 CTA
+      // 06 CTA (+ secondary START A PROJECT link)
       tl.fromTo(
         cta,
         { y: 20, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.5 },
         1.25,
+      );
+      tl.fromTo(
+        secondary,
+        { y: 16, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.45 },
+        1.35,
       );
 
       // 07 scroll cue
