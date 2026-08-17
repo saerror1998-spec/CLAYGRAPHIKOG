@@ -595,20 +595,30 @@ check(
 );
 const contactInfo = await pp.evaluate(() => {
   const t = document.body.textContent;
-  const mail = document.querySelector('a[href="mailto:connect@claygraphik.com"]');
+  const mail = document.querySelector('a[href="mailto:connects@claygraphik.com"]');
+  const tel = document.querySelector('a[href="tel:+971523412447"]');
   const wa = document.querySelector('a[href="https://wa.me/971523412447"]');
-  const ig = document.querySelector('a[href="https://instagram.com/claygraphik"]');
+  const ig = document.querySelector('a[href="https://www.instagram.com/claygraphik/"]');
+  const th = document.querySelector('a[href="https://www.threads.com/@claygraphik"]');
   return {
     email: !!mail,
+    tel: !!tel,
     whatsapp: !!wa,
     instagram: !!ig,
+    threads: !!th,
     serving: t.includes("UAE / GCC / GLOBAL"),
     phone: t.includes("+971 52 341 2447"),
   };
 });
 check(
   "contact: real contact methods present + clickable",
-  contactInfo.email && contactInfo.whatsapp && contactInfo.instagram && contactInfo.serving && contactInfo.phone,
+  contactInfo.email &&
+    contactInfo.tel &&
+    contactInfo.whatsapp &&
+    contactInfo.instagram &&
+    contactInfo.threads &&
+    contactInfo.serving &&
+    contactInfo.phone,
   JSON.stringify(contactInfo),
 );
 check(
@@ -616,26 +626,76 @@ check(
   (await pp.getByText("Multiple Services").count()) > 0 &&
     (await pp.getByText("How much does a project cost?").count()) > 0,
 );
-await pp.getByRole("button", { name: /SEND MESSAGE/ }).click();
+await pp.getByRole("button", { name: /SEND VIA WHATSAPP/ }).click();
 await sleep(300);
 check(
-  "contact: empty submit shows validation errors",
+  "contact: empty submit shows validation errors (name, contact, service)",
   (await pp.getByText("Please enter your name.").count()) > 0 &&
-    (await pp.getByText("Please enter a valid email address.").count()) > 0,
+    (await pp.getByText(/email or phone number/i).count()) > 0 &&
+    (await pp.getByText("Please select a service.").count()) > 0,
 );
-await pp.fill("#cf-name", "Test Client");
-await pp.fill("#cf-email", "test@example.com");
-await pp.fill("#cf-details", "We need a new brand identity and website before the end of the quarter.");
-await pp.getByRole("button", { name: /SEND MESSAGE/ }).click();
-await sleep(1200);
+// Invalid email format shows its own error.
+await pp.fill("#cf-email", "not-an-email");
+await pp.getByRole("button", { name: /SEND VIA WHATSAPP/ }).click();
+await sleep(300);
 check(
-  "contact: unconfigured provider shows honest error",
-  (await pp.getByText(/not connected to an email provider/i).count()) > 0,
+  "contact: invalid email shows format error",
+  (await pp.getByText("Please enter a valid email address.").count()) > 0,
 );
+// Valid submission hands off to WhatsApp with the full prefilled enquiry.
+await pp.fill("#cf-email", "test@example.com");
+await pp.fill("#cf-name", "Test Client");
+await pp.fill("#cf-company", "TestCo");
+await pp.fill("#cf-phone", "+971 50 000 0000");
+await pp.selectOption("#cf-service", "Strategy & Identity");
+await pp.selectOption("#cf-budget", "$5K – $15K");
+await pp.fill("#cf-details", "We need a new brand identity and website before the end of the quarter.");
+const popupPromise = pp.waitForEvent("popup", { timeout: 8000 });
+await pp.getByRole("button", { name: /SEND VIA WHATSAPP/ }).click();
+const popup = await popupPromise;
+const waUrl = popup.url();
+await popup.close().catch(() => {});
+const decoded = new URLSearchParams(waUrl.split("?")[1] ?? "").get("text") ?? "";
+const waTargetOk =
+  waUrl.startsWith("https://wa.me/971523412447?text=") ||
+  waUrl.includes("whatsapp.com/send/?phone=971523412447&text=");
+check(
+  "contact: valid submit opens wa.me with complete prefilled message",
+  waTargetOk &&
+    decoded.includes("Name: Test Client") &&
+    decoded.includes("Company / Brand: TestCo") &&
+    decoded.includes("Email: test@example.com") &&
+    decoded.includes("Phone / WhatsApp: +971 50 000 0000") &&
+    decoded.includes("Service: Strategy & Identity") &&
+    decoded.includes("Budget Range: $5K – $15K") &&
+    decoded.includes("new brand identity and website") &&
+    decoded.includes("Source: Clay Graphik Website") &&
+    !decoded.includes("undefined") &&
+    !decoded.includes("[object Object]"),
+  waUrl.slice(0, 120),
+);
+
+// Service-page CTA prefill: /contact?service=… selects the service.
+await pp.goto(BASE + "/contact?service=" + encodeURIComponent("Strategy & Identity"), {
+  waitUntil: "load",
+});
+await sleep(1200);
+const prefilled = await pp.evaluate(() => {
+  const sel = document.querySelector("#cf-service");
+  return sel ? sel.value : null;
+});
+check("contact: service param prefills the form select", prefilled === "Strategy & Identity", String(prefilled));
 
 // Footer + SEO on the home page
 await pp.goto(BASE + "/", { waitUntil: "load" });
 await sleep(2000);
+check(
+  "footer: connect column lists Instagram / Threads / WhatsApp / Email",
+  (await pp.getByText("Threads").count()) > 0 &&
+    (await pp.getByText("WhatsApp").count()) > 0 &&
+    (await pp.getByText("Instagram").count()) > 0 &&
+    (await pp.getByText("Email").count()) > 0,
+);
 check(
   "footer: tagline + copyright",
   (await pp.getByText("Strategic Design. Conversion Focused. Growth Driven.").count()) > 0 &&

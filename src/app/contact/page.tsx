@@ -12,18 +12,28 @@ export const metadata: Metadata = {
 
 const DIRECT = [
   { label: "EMAIL", value: site.email, href: `mailto:${site.email}` },
-  {
-    label: "PHONE / WHATSAPP",
-    value: site.phoneDisplay,
-    href: site.whatsappUrl,
-  },
+  { label: "PHONE", value: site.phoneDisplay, href: `tel:${site.phoneRaw}` },
+  { label: "WHATSAPP", value: site.phoneDisplay, href: site.whatsappUrl },
   { label: "INSTAGRAM", value: site.instagramHandle, href: site.instagramUrl },
-  { label: "WEBSITE", value: "claygraphik.com", href: site.website },
+  { label: "THREADS", value: site.threadsHandle, href: site.threadsUrl },
   { label: "LOCATION", value: site.location, href: null },
   { label: "SERVING", value: site.serviceArea, href: null },
 ];
 
-export default function ContactPage() {
+interface ContactPageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export default async function ContactPage({ searchParams }: ContactPageProps) {
+  const raw = await searchParams;
+  const service =
+    typeof raw.service === "string" ? raw.service : Array.isArray(raw.service) ? raw.service[0] : undefined;
+  const reference =
+    typeof raw.reference === "string"
+      ? raw.reference
+      : Array.isArray(raw.reference)
+        ? raw.reference[0]
+        : undefined;
   return (
     <>
       <PageHero
@@ -36,7 +46,7 @@ export default function ContactPage() {
       <div className="px-6 pb-24 sm:px-8 lg:px-10 lg:pb-32">
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
           <div className="lg:col-span-7">
-            <ContactForm />
+            <ContactForm defaultService={service} reference={reference} />
           </div>
 
           <div className="lg:col-span-4 lg:col-start-9">

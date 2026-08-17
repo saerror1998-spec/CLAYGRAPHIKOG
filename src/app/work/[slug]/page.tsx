@@ -128,6 +128,21 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
                 {project.outcome}
               </p>
             </div>
+
+            <div className="border-t border-white/[0.08] pt-8">
+              <Link
+                href={`/contact?reference=${encodeURIComponent(
+                  `Similar project enquiry — ${project.title}`,
+                )}`}
+                className="group inline-flex items-center gap-3 bg-lime px-7 py-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-carbon transition-colors duration-300 hover:bg-offwhite"
+              >
+                START A SIMILAR PROJECT
+                <ArrowUpRight
+                  aria-hidden="true"
+                  className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                />
+              </Link>
+            </div>
           </div>
         </div>
       </div>

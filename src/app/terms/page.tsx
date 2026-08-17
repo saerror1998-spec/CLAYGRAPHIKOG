@@ -34,7 +34,7 @@ const SECTIONS: Array<{ title: string; body: string }> = [
   },
   {
     title: "7. Contact",
-    body: "Questions about these terms can be sent to connect@claygraphik.com or via WhatsApp at +971 52 341 2447.",
+    body: "Questions about these terms can be sent to connects@claygraphik.com or via WhatsApp at +971 52 341 2447.",
   },
 ];
 

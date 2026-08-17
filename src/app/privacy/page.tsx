@@ -10,19 +10,19 @@ export const metadata: Metadata = {
 const SECTIONS: Array<{ title: string; body: string }> = [
   {
     title: "1. Information we collect",
-    body: "We collect information you choose to provide through the contact form — name, company, email address, phone number and project details. We do not collect personal information from visitors who only browse the website.",
+    body: "We collect information you choose to provide through the contact form — name, company, email address, phone number, service and project details. We do not collect personal information from visitors who only browse the website.",
   },
   {
-    title: "2. How we use your information",
-    body: "Information you submit through the contact form is used solely to respond to your enquiry and discuss a potential engagement. We do not sell, rent or share your personal information with third parties for marketing purposes.",
+    title: "2. How your enquiry is handled",
+    body: "When you submit the contact form, your details are formatted in your browser into a pre-filled WhatsApp message and opened in WhatsApp, where you choose to send it to Clay Graphik. The website itself does not store or transmit your form details to any Clay Graphik server. Enquiries sent via WhatsApp are then handled through WhatsApp in accordance with WhatsApp's terms. We do not sell, rent or share your personal information with third parties for marketing purposes.",
   },
   {
     title: "3. Communication",
-    body: "If you contact us, we may reply by email, phone or WhatsApp to the details you provided. You can ask us to delete your information at any time by writing to connect@claygraphik.com.",
+    body: "If you contact us, we may reply by email, phone or WhatsApp to the details you provided. You can ask us to delete your information at any time by writing to connects@claygraphik.com.",
   },
   {
     title: "4. Data retention",
-    body: "We keep enquiry details only as long as needed to handle your request and, if we work together, for the duration of our working relationship. You may request deletion at any time.",
+    body: "We keep enquiry details we receive (for example, via WhatsApp or email) only as long as needed to handle your request and, if we work together, for the duration of our working relationship. You may request deletion at any time.",
   },
   {
     title: "5. Analytics and cookies",
@@ -30,11 +30,11 @@ const SECTIONS: Array<{ title: string; body: string }> = [
   },
   {
     title: "6. Your rights",
-    body: "You have the right to access, correct or delete the personal information we hold about you. To exercise these rights, email connect@claygraphik.com.",
+    body: "You have the right to access, correct or delete the personal information we hold about you. To exercise these rights, email connects@claygraphik.com.",
   },
   {
     title: "7. Contact",
-    body: "Questions about this policy can be sent to connect@claygraphik.com or via WhatsApp at +971 52 341 2447.",
+    body: "Questions about this policy can be sent to connects@claygraphik.com or via WhatsApp at +971 52 341 2447.",
   },
 ];
 

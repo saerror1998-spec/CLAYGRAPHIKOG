@@ -14,13 +14,28 @@ export const site = {
   location: "Dubai, UAE",
   serviceArea: "UAE / GCC / GLOBAL",
   website: "https://claygraphik.com",
-  email: "connect@claygraphik.com",
+  email: "connects@claygraphik.com",
   phoneDisplay: "+971 52 341 2447",
   phoneRaw: "+971523412447",
+  whatsappNumber: "971523412447",
   whatsappUrl: "https://wa.me/971523412447",
   instagramHandle: "@claygraphik",
-  instagramUrl: "https://instagram.com/claygraphik",
+  instagramUrl: "https://www.instagram.com/claygraphik/",
+  threadsHandle: "@claygraphik",
+  threadsUrl: "https://www.threads.com/@claygraphik",
 } as const;
+
+/** Short prefilled greeting used by general WhatsApp CTA buttons. */
+export const whatsappGreeting = "Hello Clay Graphik, I'd like to discuss a project.";
+
+/**
+ * Build a wa.me link with an optional prefilled message.
+ * Falls back to the short greeting when no message is supplied.
+ */
+export function waLink(message?: string): string {
+  const text = message?.trim() ? message.trim() : whatsappGreeting;
+  return `${site.whatsappUrl}?text=${encodeURIComponent(text)}`;
+}
 
 export const navigation = [
   { label: "Home", href: "/" },
@@ -32,6 +47,7 @@ export const navigation = [
 
 export const socials = [
   { label: "Instagram", href: site.instagramUrl, external: true },
+  { label: "Threads", href: site.threadsUrl, external: true },
   { label: "WhatsApp", href: site.whatsappUrl, external: true },
   { label: "Email", href: `mailto:${site.email}`, external: false },
 ] as const;
@@ -195,5 +211,5 @@ export const organizationSchema = {
     addressCountry: "AE",
   },
   areaServed: ["AE", "GCC", "Global"],
-  sameAs: [site.instagramUrl],
+  sameAs: [site.instagramUrl, site.threadsUrl],
 } as const;

@@ -3,26 +3,69 @@
 import { useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { services } from "@/data/services";
+import { site, waLink } from "@/data/siteContent";
 
-type FormState =
-  | { status: "idle" }
-  | { status: "submitting" }
-  | { status: "success" }
-  | { status: "error"; message: string };
+type FormState = { status: "idle" } | { status: "submitting" };
 
 interface FieldErrors {
   name?: string;
+  contact?: string;
   email?: string;
+  service?: string;
   details?: string;
 }
 
 const BUDGETS = ["UNDER $5K", "$5K – $15K", "$15K – $30K", "$30K+", "PREFER NOT TO SAY"];
 
-export default function ContactForm() {
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+interface ContactFormProps {
+  /** Prefill the Service select (e.g. from a service page CTA). Editable. */
+  defaultService?: string;
+  /** Extra reference (e.g. "Similar project enquiry — …"), prefilled into Service. */
+  reference?: string;
+}
+
+export default function ContactForm({ defaultService, reference }: ContactFormProps) {
   const [state, setState] = useState<FormState>({ status: "idle" });
   const [errors, setErrors] = useState<FieldErrors>({});
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  // If a reference was passed (case-study CTA) it becomes the prefilled
+  // service value; the visitor can still switch to a standard option.
+  const serviceValue = reference || defaultService || "";
+  const referenceOption =
+    serviceValue && !services.some((s) => s.title === serviceValue) ? serviceValue : null;
+
+  const buildMessage = (p: {
+    name: string;
+    company: string;
+    email: string;
+    phone: string;
+    service: string;
+    budget: string;
+    details: string;
+  }) =>
+    [
+      "Hello Clay Graphik,",
+      "",
+      "I'd like to discuss a new project.",
+      "",
+      `Name: ${p.name}`,
+      `Company / Brand: ${p.company || "Not provided"}`,
+      `Email: ${p.email || "Not provided"}`,
+      `Phone / WhatsApp: ${p.phone || "Not provided"}`,
+      `Service: ${p.service}`,
+      `Budget Range: ${p.budget || "Not specified"}`,
+      "",
+      "Project Details:",
+      p.details,
+      "",
+      "Source: Clay Graphik Website",
+      "",
+      "Please let me know the next step.",
+    ].join("\n");
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     const data = new FormData(form);
@@ -36,56 +79,31 @@ export default function ContactForm() {
       details: String(data.get("details") ?? "").trim(),
     };
 
-    // Client validation
+    // Local validation — WhatsApp only opens when the essentials are present.
     const nextErrors: FieldErrors = {};
     if (payload.name.length < 2) nextErrors.name = "Please enter your name.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email))
+    if (payload.email && !EMAIL_RE.test(payload.email))
       nextErrors.email = "Please enter a valid email address.";
+    if (!payload.email && !payload.phone)
+      nextErrors.contact = "Please enter an email or phone number so we can reach you.";
+    if (!payload.service) nextErrors.service = "Please select a service.";
     if (payload.details.length < 20)
       nextErrors.details = "Please add a little more detail (at least 20 characters).";
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;
 
     setState({ status: "submitting" });
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (res.ok) {
-        setState({ status: "success" });
-        return;
-      }
-      const body = (await res.json().catch(() => null)) as { message?: string } | null;
-      setState({
-        status: "error",
-        message:
-          body?.message ||
-          "Something went wrong sending your message. Please try again or email connect@claygraphik.com directly.",
-      });
-    } catch {
-      setState({
-        status: "error",
-        message:
-          "Network error — your message was not sent. Please try again or email connect@claygraphik.com directly.",
-      });
-    }
-  };
+    const url = waLink(buildMessage(payload));
 
-  if (state.status === "success") {
-    return (
-      <div className="border border-lime/40 bg-lime/[0.04] p-10">
-        <p className="label-lime">MESSAGE RECEIVED</p>
-        <h2 className="mt-4 text-2xl font-medium uppercase tracking-tight text-offwhite">
-          Thanks — we&apos;ll get back to you shortly.
-        </h2>
-        <p className="mt-3 max-w-md text-sm leading-relaxed text-softgray">
-          For anything urgent, email connect@claygraphik.com directly.
-        </p>
-      </div>
-    );
-  }
+    // Brief labelled pause so the button state is visible, then open WhatsApp.
+    // If the popup is blocked, fall back to navigating the current tab —
+    // the form is never left frozen and never fakes a "sent" state.
+    window.setTimeout(() => {
+      const win = window.open(url, "_blank", "noopener,noreferrer");
+      if (!win) window.location.href = url;
+      window.setTimeout(() => setState({ status: "idle" }), 600);
+    }, 300);
+  };
 
   const inputClass = (hasError?: string) =>
     `w-full border-b bg-transparent px-0 py-3 text-base text-offwhite placeholder:text-softgray/50 focus:outline-none focus:border-lime transition-colors ${
@@ -139,10 +157,12 @@ export default function ContactForm() {
             name="email"
             type="email"
             autoComplete="email"
-            className={inputClass(errors.email)}
+            className={inputClass(errors.email || errors.contact)}
             placeholder="you@company.com"
-            aria-invalid={Boolean(errors.email)}
-            aria-describedby={errors.email ? "cf-email-error" : undefined}
+            aria-invalid={Boolean(errors.email || errors.contact)}
+            aria-describedby={
+              errors.email || errors.contact ? "cf-email-error" : undefined
+            }
           />
           {errors.email ? (
             <p id="cf-email-error" role="alert" className="mt-2 text-xs text-red-300">
@@ -163,14 +183,27 @@ export default function ContactForm() {
             className={inputClass()}
             placeholder="+971 ..."
           />
+          {errors.contact ? (
+            <p id="cf-contact-error" role="alert" className="mt-2 text-xs text-red-300">
+              {errors.contact}
+            </p>
+          ) : null}
         </div>
 
         <div>
           <label htmlFor="cf-service" className="label text-offwhite/60">
-            SERVICE
+            SERVICE *
           </label>
-          <select id="cf-service" name="service" className={inputClass()}>
+          <select
+            id="cf-service"
+            name="service"
+            defaultValue={serviceValue}
+            className={inputClass(errors.service)}
+            aria-invalid={Boolean(errors.service)}
+            aria-describedby={errors.service ? "cf-service-error" : undefined}
+          >
             <option value="">Select a service</option>
+            {referenceOption ? <option value={referenceOption}>{referenceOption}</option> : null}
             {services.map((s) => (
               <option key={s.slug} value={s.title}>
                 {s.title}
@@ -179,6 +212,11 @@ export default function ContactForm() {
             <option value="Multiple Services">Multiple Services</option>
             <option value="Not Sure Yet">Not Sure Yet</option>
           </select>
+          {errors.service ? (
+            <p id="cf-service-error" role="alert" className="mt-2 text-xs text-red-300">
+              {errors.service}
+            </p>
+          ) : null}
         </div>
 
         <div>
@@ -216,23 +254,22 @@ export default function ContactForm() {
         </div>
       </div>
 
-      <div className="mt-10 flex flex-col items-start gap-6 sm:flex-row sm:items-center">
+      <div className="mt-10 flex flex-col items-start gap-4">
         <button
           type="submit"
           disabled={state.status === "submitting"}
           className="group inline-flex cursor-pointer items-center gap-3 bg-lime px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-carbon transition-colors duration-300 hover:bg-offwhite disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {state.status === "submitting" ? "SENDING…" : "SEND MESSAGE"}
+          {state.status === "submitting" ? "PREPARING WHATSAPP…" : "SEND VIA WHATSAPP"}
           <ArrowUpRight
             aria-hidden="true"
             className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
           />
         </button>
-        {state.status === "error" ? (
-          <p role="alert" className="max-w-md text-sm leading-relaxed text-red-300">
-            {state.message}
-          </p>
-        ) : null}
+        <p className="max-w-md text-xs leading-relaxed text-softgray/60">
+          Your details stay in your browser — submitting opens WhatsApp with your message
+          ready to send to {site.email}.
+        </p>
       </div>
     </form>
   );

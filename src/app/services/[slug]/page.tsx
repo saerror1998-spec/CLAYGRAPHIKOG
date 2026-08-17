@@ -74,7 +74,7 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
             </p>
 
             <Link
-              href="/contact"
+              href={`/contact?service=${encodeURIComponent(service.title)}`}
               className="group mt-10 inline-flex items-center gap-3 bg-lime px-7 py-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-carbon transition-colors duration-300 hover:bg-offwhite"
             >
               START A PROJECT

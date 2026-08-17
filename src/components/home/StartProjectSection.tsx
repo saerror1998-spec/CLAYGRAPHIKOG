@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import SectionLabel from "./SectionLabel";
+import { site, waLink } from "@/data/siteContent";
 
 const ACTIONS = [
   {
@@ -11,13 +12,13 @@ const ACTIONS = [
   },
   {
     label: "WHATSAPP",
-    href: "https://wa.me/971523412447",
+    href: waLink(),
     external: true,
     primary: false,
   },
   {
     label: "EMAIL",
-    href: "mailto:connect@claygraphik.com",
+    href: `mailto:${site.email}`,
     external: false,
     primary: false,
   },
