@@ -40,8 +40,8 @@ export const projects: Project[] = [
     status: "concept",
     summary:
       "A complete identity system study — mark, palette, type and applications — built to keep a brand consistent across every touchpoint.",
-    image: "/projects/brand-book-system.jpg",
-    imageAlt: "Editorial spread of the Clay Graphik brand book system",
+    image: "/images/clay-graphik/clay-graphik-brand-identity.png",
+    imageAlt: "Clay Graphik brand identity and visual system presentation",
     overview:
       "A brand is only as strong as its consistency. This studio concept documents a complete identity system: how the palette, typography and layout rules work together across print and digital.",
     objective:
@@ -63,8 +63,8 @@ export const projects: Project[] = [
     status: "concept",
     summary:
       "A high-converting website concept — clear hierarchy, editorial pace and a conversion path that moves visitors from interest to action.",
-    image: "/projects/concept-web-platform.svg",
-    imageAlt: "Abstract editorial concept visual for a web platform project",
+    image: "/images/clay-graphik/clay-graphik-digital-system.png",
+    imageAlt: "Clay Graphik digital design system and interface presentation",
     overview:
       "Websites are the front door of a modern business. This studio concept shows how information architecture, editorial layout and motion work together to build trust fast.",
     objective:
