@@ -1,16 +1,23 @@
 import Hero from "@/components/home/Hero";
+import WhatWeDo from "@/components/home/WhatWeDo";
+import SelectedWork from "@/components/home/SelectedWork";
+import SignatureScroll from "@/components/home/SignatureScroll";
+import ServicesSection from "@/components/home/ServicesSection";
+import ProcessSection from "@/components/home/ProcessSection";
+import StudioSection from "@/components/home/StudioSection";
+import StartProjectSection from "@/components/home/StartProjectSection";
 
 export default function HomePage() {
   return (
     <>
       <Hero />
-      {/* 01 / WHAT WE DO — Phase 4 */}
-      {/* 02 / SELECTED WORK — Phase 4 */}
-      {/* 03 / FROM IDEA TO IMPACT — Phase 4 */}
-      {/* 04 / SERVICES — Phase 4 */}
-      {/* 05 / PROCESS — Phase 4 */}
-      {/* 06 / STUDIO — Phase 4 */}
-      {/* 07 / START A PROJECT — Phase 4 */}
+      <WhatWeDo />
+      <SelectedWork />
+      <SignatureScroll />
+      <ServicesSection />
+      <ProcessSection />
+      <StudioSection />
+      <StartProjectSection />
     </>
   );
 }

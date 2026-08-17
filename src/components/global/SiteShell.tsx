@@ -57,13 +57,18 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
   }, [menuOpen, lenis]);
 
   // Foreground stage shift (desktop only, no reduced motion).
+  // IMPORTANT: never leave a residual transform on the stage when closed —
+  // a transformed ancestor becomes the containing block for fixed elements
+  // and breaks ScrollTrigger's fixed pinning inside the stage.
+  const stageMountedRef = useRef(false);
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage || reduced) return;
-    if (window.innerWidth < 1024) {
-      gsap.set(stage, { x: 0, scale: 1 });
-      return;
+    if (!stageMountedRef.current) {
+      stageMountedRef.current = true;
+      return; // skip the initial no-op animation
     }
+    if (window.innerWidth < 1024) return;
 
     if (menuOpen) {
       const scale = 0.94;
@@ -80,7 +85,15 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
         transformOrigin: "50% 50%",
       });
     } else {
-      gsap.to(stage, { x: 0, scale: 1, duration: 0.55, ease: "power3.inOut" });
+      gsap.to(stage, {
+        x: 0,
+        scale: 1,
+        duration: 0.55,
+        ease: "power3.inOut",
+        onComplete: () => {
+          if (!menuOpenRef.current) gsap.set(stage, { clearProps: "transform" });
+        },
+      });
     }
   }, [menuOpen, reduced]);
 
@@ -118,10 +131,13 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
         <UnderlayMenu />
         <div className="relative min-h-screen overflow-x-clip bg-carbon">
           {/* Foreground stage */}
+          {/* NOTE: no will-change/transform on this wrapper — a transformed
+              ancestor would become the containing block for fixed elements
+              and break ScrollTrigger's fixed pinning inside the stage. */}
           <div
             ref={stageRef}
             data-stage
-            className="relative z-[2] will-change-transform"
+            className="relative z-[2]"
             onClick={handleStageClick}
           >
             <div className="p-3 sm:p-4 lg:p-6">
