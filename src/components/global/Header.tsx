@@ -12,7 +12,7 @@ export default function Header() {
   const { menuOpen, toggleMenu } = useSite();
 
   return (
-    <header className="relative z-20 flex items-center justify-between px-6 pt-6 sm:px-8 sm:pt-8 lg:px-10 lg:pt-10">
+    <header className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-6 pt-6 sm:px-8 sm:pt-8 lg:px-10 lg:pt-10">
       <Link href="/" aria-label="Clay Graphik — Home" className="inline-block">
         <Image
           src="/brand/clay-graphik-logo.png"

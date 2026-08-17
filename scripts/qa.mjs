@@ -118,7 +118,7 @@ page.on("console", (m) => {
 page.on("pageerror", (e) => errors.push("PAGEERROR: " + e.message));
 
 await page.goto(BASE, { waitUntil: "load" });
-await sleep(2600); // entry sequence
+await sleep(5600); // entry sequence + full hero entrance (~4.5s)
 
 check(
   "entry: loader hidden after sequence",
@@ -127,6 +127,76 @@ check(
 
 const overflow = await noHOverflow(page);
 check("layout: no horizontal overflow @1440", overflow <= 1, `overflow=${overflow}`);
+
+// ---- Hero gate @1440x900 ----
+const heroVisible = await page.evaluate(() => {
+  const h1 = document.querySelector("h1");
+  const chars = document.querySelectorAll(".split-char");
+  const all = [...chars].every((el) => {
+    const cs = getComputedStyle(el);
+    return parseFloat(cs.opacity) > 0.9;
+  });
+  return { h1: !!h1, chars: chars.length, all };
+});
+check("hero: split chars all visible", heroVisible.all, `chars=${heroVisible.chars}`);
+check(
+  "hero: that move shine active + gradient lime",
+  await page.evaluate(() => {
+    const s = document.querySelector("[data-shine]");
+    const cs = s ? getComputedStyle(s) : null;
+    return (
+      s?.classList.contains("shine-active") &&
+      cs.color === "rgba(0, 0, 0, 0)" &&
+      cs.backgroundImage.includes("204, 255, 0")
+    );
+  }),
+);
+check(
+  "hero: eyebrow visible",
+  await page.evaluate(() => parseFloat(getComputedStyle(document.querySelector("[data-hero-eyebrow]")).opacity) > 0.9),
+);
+check(
+  "hero: CTA visible",
+  await page.evaluate(() => parseFloat(getComputedStyle(document.querySelector("[data-hero-cta]")).opacity) > 0.9),
+);
+const aurora = await page.evaluate(() => {
+  const ctn = document.querySelector(".hero-aurora");
+  const canvas = ctn?.querySelector("canvas");
+  return {
+    canvas: !!canvas,
+    w: canvas?.width || 0,
+    h: canvas?.height || 0,
+    frames: Number(ctn?.dataset.frames || 0),
+  };
+});
+check("aurora: canvas exists with size", aurora.canvas && aurora.w > 100 && aurora.h > 100, JSON.stringify(aurora));
+check("aurora: render loop advancing", aurora.frames > 10, `frames=${aurora.frames}`);
+
+// Hero first-viewport fit on the required desktop sizes
+for (const [w, h] of [[1920, 1080], [1600, 900], [1440, 900], [1366, 768]]) {
+  const c = await browser.newContext({ viewport: { width: w, height: h }, reducedMotion: "no-preference" });
+  const p = await c.newPage();
+  await p.goto(BASE, { waitUntil: "load" });
+  await sleep(5600);
+  const fit = await p.evaluate(() => {
+    const cue = document.querySelector("[data-hero-cue]");
+    const cta = document.querySelector("[data-hero-cta]");
+    const cueRect = cue.getBoundingClientRect();
+    const ctaRect = cta.getBoundingClientRect();
+    return {
+      cueBottom: cueRect.bottom,
+      ctaBottom: ctaRect.bottom,
+      vh: window.innerHeight,
+      ctaVisible: parseFloat(getComputedStyle(cta).opacity) > 0.9,
+    };
+  });
+  check(
+    `hero: fits one viewport @${w}x${h}`,
+    fit.ctaVisible && fit.cueBottom <= fit.vh && fit.ctaBottom <= fit.vh,
+    JSON.stringify(fit),
+  );
+  await c.close();
+}
 
 await menuSuite(page);
 
