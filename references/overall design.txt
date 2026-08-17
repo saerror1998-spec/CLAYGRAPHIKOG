@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OSMO Creative Studio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#dec1af",
+                        "on-secondary-container": "#ccb09f",
+                        "on-tertiary-container": "#2c2c2c",
+                        "surface-tint": "#ffb4a2",
+                        "on-error-container": "#ffdad6",
+                        "on-surface-variant": "#e3beb5",
+                        "surface-container-low": "#1a1c1c",
+                        "on-surface": "#e2e2e2",
+                        "on-tertiary": "#313030",
+                        "secondary": "#dec1af",
+                        "surface-bright": "#38393a",
+                        "surface-container-highest": "#333535",
+                        "secondary-container": "#574335",
+                        "error": "#ffb4ab",
+                        "surface-variant": "#333535",
+                        "on-background": "#e2e2e2",
+                        "surface": "#121414",
+                        "on-primary-fixed": "#3c0700",
+                        "tertiary": "#c8c6c5",
+                        "surface-container-lowest": "#0c0f0f",
+                        "surface-container": "#1e2020",
+                        "inverse-on-surface": "#2f3131",
+                        "outline": "#aa8981",
+                        "on-error": "#690005",
+                        "tertiary-container": "#959392",
+                        "background": "#121414",
+                        "on-secondary-fixed-variant": "#574335",
+                        "surface-container-high": "#282a2b",
+                        "error-container": "#93000a",
+                        "inverse-surface": "#e2e2e2",
+                        "primary-fixed-dim": "#ffb4a2",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "on-secondary": "#3f2c20",
+                        "on-primary-fixed-variant": "#8a1d00",
+                        "on-primary": "#611200",
+                        "tertiary-fixed": "#e5e2e1",
+                        "primary": "#ffb4a2",
+                        "on-secondary-fixed": "#28180d",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "secondary-fixed": "#fbddca",
+                        "primary-fixed": "#ffdad2",
+                        "on-tertiary-fixed-variant": "#474746",
+                        "inverse-primary": "#b42900",
+                        "outline-variant": "#5b413a",
+                        "surface-dim": "#121414",
+                        "on-primary-container": "#590f00",
+                        "primary-container": "#ff5c33"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-overlap": "4rem",
+                        "gutter": "1.5rem",
+                        "container-padding": "2.5rem",
+                        "section-gap": "8rem"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "label-sm": ["JetBrains Mono"],
+                        "nav-link": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"],
+                        "display-lg": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["64px", { "lineHeight": "110%", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["40px", { "lineHeight": "110%", "fontWeight": "500" }],
+                        "label-sm": ["12px", { "lineHeight": "140%", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "nav-link": ["56px", { "lineHeight": "120%", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                        "body-md": ["18px", { "lineHeight": "160%", "fontWeight": "400" }],
+                        "display-lg": ["96px", { "lineHeight": "100%", "letterSpacing": "-0.04em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md overflow-x-hidden min-h-screen flex">
+<!-- Main Content Area (The Stage) -->
+<main class="flex-1 transition-all duration-500 ease-in-out lg:pr-[400px] relative z-10 p-4 lg:p-10">
+<div class="bg-surface-container rounded-[2rem] overflow-hidden shadow-2xl min-h-[calc(100vh-2rem)] lg:min-h-[calc(100vh-5rem)] flex flex-col relative">
+<!-- Mobile Top Bar -->
+<header class="flex justify-between items-center px-gutter py-4 w-full fixed top-0 left-0 z-50 lg:hidden bg-transparent pointer-events-none">
+<div class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-on-surface pointer-events-auto">OSMO</div>
+<button class="pointer-events-auto text-primary">
+<span class="material-symbols-outlined text-3xl">menu</span>
+</button>
+</header>
+<!-- Hero Section -->
+<section class="relative h-[80vh] lg:h-[90vh] flex items-center justify-center overflow-hidden rounded-t-[2rem]">
+<img alt="Fixed Underlay Navigation Concept" class="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-luminosity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpHISH35mQ77YepqLcbEyjJUbm1QWdJnhdZBRvKrQg0mVCzsz6G7zWPZBwBmXkH_4RK9oHFrlMYkEuqwwER7fuNoQv7UqrrxViYu5UsxVtIPfeUe1yAGqwkDyAR7hcWDJfv2-VfzmDA1zsbNkl2GfTOQ92tff2qvXr91x4A3W37rBBRQy45xCDX13eCIxzqeaMOkk_8p2QRJ9u-wQDH6lJYjC0f8atnJU_nKqJrOxCH3fV57CJvlGLm_UCoUjcyqPwgg"/>
+<div class="absolute inset-0 bg-gradient-to-b from-surface-container-highest/30 to-surface-container/90"></div>
+<div class="relative z-10 text-center px-4">
+<h1 class="font-display-lg text-display-lg font-semibold text-primary mb-4 tracking-tighter">Fixed Underlay<br/>Navigation</h1>
+</div>
+<div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce text-primary">
+<span class="material-symbols-outlined text-4xl" data-icon="south">south</span>
+</div>
+</section>
+<!-- Selected Projects -->
+<section class="py-section-gap px-container-padding bg-surface-container">
+<div class="max-w-6xl mx-auto">
+<div class="flex justify-between items-end mb-12 border-b border-outline-variant pb-4">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Selected Projects</h2>
+<a class="font-label-sm text-label-sm text-primary uppercase hover:text-primary-fixed transition-colors flex items-center gap-2" href="#">
+                            View All <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Project 1 -->
+<article class="group cursor-pointer">
+<div class="relative aspect-[4/5] overflow-hidden rounded-xl mb-4 bg-surface-container-high">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A striking minimalist architectural photography shot, focusing on brutalist concrete textures and stark shadows. Warm, earthy sunset lighting casts long angular shapes across a clean, modern building facade. The image emphasizes structural integrity, quiet luxury, and modern minimal design, blending organic tones with precise geometry." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDxFvPQ6JmielnVgzEwHYr5ThL4TY4PslVWxwdJUdME9ImstWm0UWr7MzCHM079hr3WgcmSRg7RwssqrMG85vT2E3zHgH_1JOx8rXKgapPkdg0SBhUlLvokBF6-Ca3LSTtXC3lZjLLl1zFq1guWRQSVLxSiUviq4q_ek3buQie_BFfRrEBB0_nY8x8RXRMmJchdBRpvzlET6FvQd39VahYsl0uZrkS9Xx4iNu8pXkc9-ciLX8z5QkQy')"></div>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-1">Aura Pavilion</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Architecture / 2023</p>
+</div>
+</div>
+</article>
+<!-- Project 2 -->
+<article class="group cursor-pointer mt-0 md:mt-16">
+<div class="relative aspect-[4/5] overflow-hidden rounded-xl mb-4 bg-surface-container-high">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="An abstract macro shot of layered organic materials, perhaps ceramic or weathered stone, revealing deep rich umber and terracotta hues. The lighting is soft and directional, highlighting the tactile earthy textures and creating a sense of physical depth without harsh highlights. The composition is asymmetrical and sophisticated, fitting a high-end artisanal brand aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDiI9pyhyQKdvRF8jxL3gUtSEJUI3xy1T3hHwsoqjbTlWht4icJrceqY5bJZMqu4pdtf-K_wPg9S6i6jduxFZsnyrZ-_nj5jG2DtDaTRKiZryuYcq2Sm3q1PJxMPe27EmH60GsEZiYz9FN4fS5x_DNMAkR82OwzqkOHSk9p1nlpLaXWqSfoPfmYKrdiSi9xrzQJhdhu1fHvg2O2Kdw1YQXgQF1yEK70Z4Y7nFGE6d2deQ-s09CmGM_v')"></div>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-1">Terra Collection</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Industrial Design / 2024</p>
+</div>
+</div>
+</article>
+</div>
+</div>
+</section>
+<!-- About Section -->
+<section class="py-section-gap px-container-padding bg-surface-container-low border-y border-outline-variant">
+<div class="max-w-4xl mx-auto text-center">
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-widest block mb-8">Creative Excellence</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-10 leading-tight">Bridging the gap between raw, tactile earthiness and clean, high-end digital precision.</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto mb-12">We are an independent studio crafting architectural, minimalist, and artisanal digital experiences for sophisticated brands globally.</p>
+<button class="bg-primary-container text-on-primary-container px-8 py-4 rounded-full font-label-sm text-label-sm uppercase hover:scale-[1.02] transition-transform duration-300 shadow-lg flex items-center gap-3 mx-auto">
+                        Discover Our Process <span class="material-symbols-outlined" data-icon="arrow_outward">arrow_outward</span>
+</button>
+</div>
+</section>
+<!-- Embedded Footer -->
+<footer class="w-full py-section-gap px-container-padding bg-surface-container mt-auto">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-12">
+<div class="flex-1">
+<div class="font-display-lg text-headline-lg font-bold text-on-surface mb-4">OSMO</div>
+<p class="text-on-surface-variant max-w-xs mb-8">Creative Studio focusing on physical depth and editorial typography.</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 Osmo Studio. All rights reserved.</p>
+</div>
+<div class="flex gap-16">
+<div>
+<h4 class="font-label-sm text-label-sm text-on-surface uppercase mb-6 opacity-50">Socials</h4>
+<ul class="space-y-4 font-body-md text-body-md">
+<li><a class="text-on-surface hover:text-primary transition-colors flex items-center justify-between group" href="#">Instagram <span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity" data-icon="arrow_outward">arrow_outward</span></a></li>
+<li><a class="text-on-surface hover:text-primary transition-colors flex items-center justify-between group" href="#">LinkedIn <span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity" data-icon="arrow_outward">arrow_outward</span></a></li>
+<li><a class="text-on-surface hover:text-primary transition-colors flex items-center justify-between group" href="#">Twitter <span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity" data-icon="arrow_outward">arrow_outward</span></a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-sm text-label-sm text-on-surface uppercase mb-6 opacity-50">Quick Links</h4>
+<ul class="space-y-4 font-body-md text-body-md">
+<li><a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Privacy Policy</a></li>
+<li><a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Terms of Service</a></li>
+<li><a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Cookies</a></li>
+</ul>
+</div>
+</div>
+</div>
+</footer>
+</div>
+</main>
+<!-- Fixed Underlay Navigation (SideNavBar) -->
+<aside class="fixed right-0 top-0 h-full w-[400px] hidden lg:flex flex-col bg-surface border-l border-outline-variant z-0 justify-between p-container-padding">
+<div class="flex justify-between items-center mb-16">
+<div class="font-display-lg text-headline-lg font-semibold text-primary">OSMO</div>
+<button class="text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-3xl" data-icon="close">close</span>
+</button>
+</div>
+<nav class="flex-1 flex flex-col justify-center">
+<ul class="space-y-2">
+<li>
+<a class="font-nav-link text-nav-link uppercase tracking-tighter text-on-primary bg-primary-container px-4 py-2 block w-full hover:scale-[1.02] transition-transform" href="#">
+                        Home
+                    </a>
+</li>
+<li>
+<a class="font-nav-link text-nav-link uppercase tracking-tighter text-on-surface hover:text-primary transition-colors duration-300 px-4 py-2 block w-full hover:scale-[1.02]" href="#">
+                        Projects
+                    </a>
+</li>
+<li>
+<a class="font-nav-link text-nav-link uppercase tracking-tighter text-on-surface hover:text-primary transition-colors duration-300 px-4 py-2 block w-full hover:scale-[1.02]" href="#">
+                        About
+                    </a>
+</li>
+<li>
+<a class="font-nav-link text-nav-link uppercase tracking-tighter text-on-surface hover:text-primary transition-colors duration-300 px-4 py-2 block w-full hover:scale-[1.02]" href="#">
+                        Services
+                    </a>
+</li>
+<li>
+<a class="font-nav-link text-nav-link uppercase tracking-tighter text-on-surface hover:text-primary transition-colors duration-300 px-4 py-2 block w-full hover:scale-[1.02]" href="#">
+                        News
+                    </a>
+</li>
+<li>
+<a class="font-nav-link text-nav-link uppercase tracking-tighter text-on-surface hover:text-primary transition-colors duration-300 px-4 py-2 block w-full hover:scale-[1.02]" href="#">
+                        Contact
+                    </a>
+</li>
+</ul>
+</nav>
+<div class="mt-auto border-t border-outline-variant pt-8 flex justify-between items-center">
+<div class="flex gap-4">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm uppercase" href="#">IG</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm uppercase" href="#">IN</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm uppercase" href="#">TW</a>
+</div>
+<a class="text-on-surface font-label-sm text-label-sm uppercase underline hover:text-primary transition-colors" href="#">Start a Project</a>
+</div>
+</aside>
+</body></html>

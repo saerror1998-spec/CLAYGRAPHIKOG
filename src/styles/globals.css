@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Clay Graphik brand palette */
+  --color-lime: #ccff00;
+  --color-carbon: #050505;
+  --color-charcoal: #121212;
+  --color-offwhite: #f4f4ee;
+  --color-softgray: #b9b9b3;
+
+  /* Typography */
+  --font-sans: var(--font-hanken);
+  --font-mono: var(--font-jetbrains);
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-carbon text-offwhite font-sans antialiased;
+    overscroll-behavior-y: none;
+  }
+
+  ::selection {
+    background: #ccff00;
+    color: #050505;
+  }
+
+  /* Visible keyboard focus */
+  :focus-visible {
+    outline: 2px solid #ccff00;
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #050505;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #262626;
+    border-radius: 8px;
+    border: 2px solid #050505;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a3a3a;
+  }
+
+  /* Lenis recommended styles */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+}
+
+@layer utilities {
+  /* Editorial label: JetBrains Mono technical label */
+  .label {
+    @apply font-mono text-[11px] uppercase tracking-[0.18em] text-softgray;
+  }
+
+  .label-lime {
+    @apply font-mono text-[11px] uppercase tracking-[0.18em] text-lime;
+  }
+
+  /* Hide scrollbar utility (filter bars, etc.) */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ShinyText sweep — narrow bright highlight moving horizontally */
+@keyframes shine-sweep {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+.shine-text {
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
