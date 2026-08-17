@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Color, Mesh, Program, Renderer, Triangle } from "ogl";
+import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 
 const VERT = `#version 300 es
 in vec2 position;
@@ -132,10 +133,11 @@ export default function Aurora({
   const ctnRef = useRef<HTMLDivElement>(null);
   const propsRef = useRef({ colorStops, amplitude, blend, speed });
   propsRef.current = { colorStops, amplitude, blend, speed };
+  const reduced = usePrefersReducedMotion();
 
   useEffect(() => {
     const ctn = ctnRef.current;
-    if (!ctn) return;
+    if (!ctn || reduced) return;
 
     let renderer: Renderer;
     try {
@@ -238,7 +240,7 @@ export default function Aurora({
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [reduced]);
 
   return (
     <div
