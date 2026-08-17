@@ -99,9 +99,14 @@ void main() {
   float height = snoise(vec2(uv.x * 2.0 + uTime * 0.1, uTime * 0.25)) * 0.5 * uAmplitude;
   height = exp(height);
   height = (uv.y * 2.0 - height + 0.2);
-  float intensity = 0.6 * height;
+  // Brightness tuned for the Clay Graphik palette: the reference's 0.6 factor
+  // with a dark mid-stop (#121212) reads as near-flat black, so the intensity
+  // is lifted and the band midpoint raised slightly so the lime atmospheric
+  // movement is clearly perceptible. Noise/ramp/alpha math is otherwise
+  // identical to the reference shader.
+  float intensity = 1.2 * height;
 
-  float midPoint = 0.20;
+  float midPoint = 0.16;
   float auroraAlpha = smoothstep(midPoint - uBlend * 0.5, midPoint + uBlend * 0.5, intensity);
 
   vec3 auroraColor = intensity * rampColor;
@@ -140,12 +145,17 @@ export default function Aurora({
     if (!ctn || reduced) return;
 
     let renderer: Renderer;
+    let dpr = 1;
     try {
+      dpr = Math.min(typeof window !== "undefined" ? window.devicePixelRatio : 1, 1.25);
       renderer = new Renderer({
         alpha: true,
         premultipliedAlpha: true,
         antialias: true,
-        dpr: Math.min(typeof window !== "undefined" ? window.devicePixelRatio : 1, 1.5),
+        dpr,
+        // Keep the drawing buffer so the rendered frame can be captured
+        // (screenshots / pixel verification) without extra render passes.
+        preserveDrawingBuffer: true,
       });
     } catch {
       // WebGL unavailable — hero simply renders without the aurora.
@@ -166,7 +176,9 @@ export default function Aurora({
       if (!width || !height) return;
       renderer.setSize(width, height);
       if (program) {
-        program.uniforms.uResolution.value = [width, height];
+        // gl_FragCoord is in device pixels; uResolution must match so the
+        // shader's uv stays in 0..1 exactly as the reference intends.
+        program.uniforms.uResolution.value = [width * dpr, height * dpr];
       }
     };
 
@@ -191,7 +203,7 @@ export default function Aurora({
         uTime: { value: 0 },
         uAmplitude: { value: amplitude },
         uColorStops: { value: stopsToArray(colorStops) },
-        uResolution: { value: [ctn.offsetWidth || 1, ctn.offsetHeight || 1] },
+        uResolution: { value: [(ctn.offsetWidth || 1) * dpr, (ctn.offsetHeight || 1) * dpr] },
         uBlend: { value: blend },
       },
     });

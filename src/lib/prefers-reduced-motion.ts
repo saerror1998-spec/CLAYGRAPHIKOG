@@ -1,22 +1,26 @@
 "use client";
 
-import { useLayoutEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 /**
- * Tracks the user's prefers-reduced-motion preference.
- * The initial read happens in a layout effect (before paint) so no animated
- * UI ever flashes for reduced-motion users.
+ * Tracks prefers-reduced-motion with a synchronous, hydration-safe read.
+ *
+ * useSyncExternalStore resolves the live value (via getSnapshot) before the
+ * first paint — so client components see the correct preference on their very
+ * first render and no GSAP/CSS "non-reduced" pass ever leaks into a
+ * reduced-motion session. The server snapshot (false) keeps SSR HTML
+ * consistent during hydration.
  */
+const subscribe = (onStoreChange: () => void) => {
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mq.addEventListener("change", onStoreChange);
+  return () => mq.removeEventListener("change", onStoreChange);
+};
+
+const getSnapshot = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const getServerSnapshot = () => false;
+
 export function usePrefersReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
-
-  useLayoutEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const onChange = (e: MediaQueryListEvent) => setReduced(e.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-
-  return reduced;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

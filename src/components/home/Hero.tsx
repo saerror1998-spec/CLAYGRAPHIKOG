@@ -33,11 +33,17 @@ export default function Hero() {
       // Reduced motion: leave everything visible, skip the sequence.
       if (reduced || !entryDone) return;
 
-      const h1 = root.querySelector("h1");
-      let split: SplitText | null = null;
-      if (h1) {
+      // IMPORTANT: split each WHITE line individually — never the <h1> as a
+      // whole, because that would also SplitText the ShinyText span (breaking
+      // its background-clip and collapsing THAT MOVE. to a zero-size block).
+      // ShinyText owns the gradient; GSAP owns the line wrappers.
+      const lineEls = Array.from(root.querySelectorAll<HTMLElement>("[data-hero-line]"));
+      const splits: SplitText[] = [];
+      const lineGroups: HTMLElement[][] = [];
+      lineEls.forEach((line) => {
+        let split: SplitText | null = null;
         try {
-          split = new SplitText(h1, {
+          split = new SplitText(line, {
             type: "chars",
             charsClass: "split-char",
             reduceWhiteSpace: false,
@@ -45,12 +51,13 @@ export default function Hero() {
         } catch {
           split = null;
         }
-      }
-
-      const lineEls = Array.from(root.querySelectorAll<HTMLElement>("[data-hero-line]"));
-      const lineGroups = lineEls.map((line) =>
-        Array.from(line.querySelectorAll<HTMLElement>(".split-char")),
-      );
+        if (split) {
+          splits.push(split);
+          lineGroups.push(Array.from(split.chars as HTMLElement[]));
+        } else {
+          lineGroups.push([]);
+        }
+      });
       const singleLine = root.querySelector<HTMLElement>("[data-hero-line-single]");
 
       const eyebrow = root.querySelector("[data-hero-eyebrow]");
@@ -84,11 +91,18 @@ export default function Hero() {
         );
       });
 
-      // 04 — THAT MOVE. (lime, shine handled by CSS after entrance)
+      // 04 — THAT MOVE. (lime, shine handled by CSS after entrance).
+      // GSAP animates ONLY the wrapper (transform + opacity); the ShinyText
+      // span inside is never touched by GSAP.
       tl.fromTo(
         singleLine,
         { yPercent: 120, opacity: 0 },
-        { yPercent: 0, opacity: 1, duration: 0.9 },
+        {
+          yPercent: 0,
+          opacity: 1,
+          duration: 0.9,
+          onComplete: () => gsap.set(singleLine, { clearProps: "transform" }),
+        },
         lineGroups.length ? 0.15 + lineGroups.length * 1.05 : 2.4,
       );
 
@@ -117,7 +131,7 @@ export default function Hero() {
       }, 4.05);
 
       return () => {
-        split?.revert();
+        splits.forEach((s) => s.revert());
       };
     },
     { scope: rootRef, dependencies: [entryDone, reduced] },
@@ -147,10 +161,11 @@ export default function Hero() {
         amplitude={1.0}
         speed={1}
       />
-      {/* Subtle readability mask — never opaque */}
+      {/* Subtle readability mask — max ~20% at the top, ~55% only at the
+          very bottom edge. Never opaque, never buries the aurora. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-charcoal/40 via-charcoal/10 to-charcoal/70"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-charcoal/20 via-transparent to-charcoal/55"
       />
 
       <div className="relative z-10 flex flex-1 flex-col justify-end pb-24 pt-28 lg:pb-28">
@@ -173,7 +188,7 @@ export default function Hero() {
           </span>
           <span
             data-hero-line-single
-            className="block overflow-hidden text-[clamp(2.6rem,7.5vw,5.9rem)]"
+            className="that-move-motion-wrapper block overflow-hidden text-[clamp(2.6rem,7.5vw,5.9rem)]"
           >
             <ShinyText className="text-lime">THAT MOVE.</ShinyText>
           </span>

@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * ShinyText — CSS-only shine for `THAT MOVE.`
+ * ShinyText — CSS-only shine surface for `THAT MOVE.`
  *
- * Architecture per the design brief: an outer wrapper (GSAP-controlled by the
- * hero timeline) slides this element into place, while the shine itself is a
- * pure CSS background-position sweep on the static text. No JS animation loop,
- * no glow halo, no flashing: a narrow off-white highlight crosses the lime
- * text once after the entrance, then breathes before repeating.
+ * Ownership: this element owns ONLY the text gradient + background-position
+ * (pure CSS). The outer wrapper (`.that-move-motion-wrapper`) is what GSAP
+ * animates on entrance — GSAP never touches this span, and this span is never
+ * SplitText-wrapped. This prevents the background-clip surface from being
+ * broken by character wrappers.
  */
 export default function ShinyText({
   children,
@@ -17,11 +17,7 @@ export default function ShinyText({
   className?: string;
 }) {
   return (
-    <span
-      data-shine
-      className={`shine-text ${className}`}
-      style={{ color: "transparent" }}
-    >
+    <span data-shine className={`shine-text ${className}`}>
       {children}
     </span>
   );

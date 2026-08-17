@@ -87,18 +87,17 @@
   }
 }
 
-/* ShinyText — narrow bright highlight moving horizontally through static text */
+/* ShinyText — narrow bright highlight moving horizontally through static text.
+   ShinyText owns ONLY the gradient + background-position (CSS). GSAP never
+   touches this element — GSAP animates the outer wrapper instead. */
 @keyframes shine-sweep {
   0% {
     background-position: 200% center;
   }
-  18% {
+  10% {
     background-position: 200% center;
   }
-  30% {
-    background-position: 0% center;
-  }
-  42% {
+  50% {
     background-position: -200% center;
   }
   100% {
@@ -115,11 +114,15 @@
   );
   background-size: 240% auto;
   background-position: 200% center;
+  background-repeat: no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 .shine-text.shine-active {
+  /* ~2.3s sweep, then a long rest before repeating */
   animation: shine-sweep 5.5s ease-in-out 0.4s infinite;
 }
 

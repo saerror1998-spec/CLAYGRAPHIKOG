@@ -177,7 +177,9 @@ for (const [w, h] of [[1920, 1080], [1600, 900], [1440, 900], [1366, 768]]) {
   const c = await browser.newContext({ viewport: { width: w, height: h }, reducedMotion: "no-preference" });
   const p = await c.newPage();
   await p.goto(BASE, { waitUntil: "load" });
-  await sleep(5600);
+  // loader (~1.4s) + full hero entrance (~4.1s) + headroom; this must not
+  // race the CTA entrance or the fit check flakes under load.
+  await sleep(7000);
   const fit = await p.evaluate(() => {
     const cue = document.querySelector("[data-hero-cue]");
     const cta = document.querySelector("[data-hero-cta]");

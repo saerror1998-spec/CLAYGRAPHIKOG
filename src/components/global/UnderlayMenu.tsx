@@ -36,7 +36,24 @@ export default function UnderlayMenu() {
   // Initial hidden state (before first paint).
   useGSAP(
     () => {
-      if (reduced) return;
+      // Read the live preference directly rather than trusting the hook's
+      // snapshot: during hydration the hook can briefly return the server
+      // value (false), and if the non-reduced hidden-state pass ran even
+      // once it would leave a residual inline transform that fights the
+      // reduced class path and traps the panel offscreen.
+      const reducedNow =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reducedNow) {
+        // Reduced motion: the panel/labels are shown/hidden by CSS classes,
+        // so clear any residual GSAP transforms and let the class path own
+        // layout.
+        gsap.set("[data-underlay-layer], [data-underlay-panel]", { clearProps: "transform" });
+        gsap.set("[data-menu-item-label]", { clearProps: "transform" });
+        gsap.set("[data-menu-number]", { clearProps: "opacity" });
+        gsap.set("[data-menu-social]", { clearProps: "transform,opacity" });
+        return;
+      }
       gsap.set("[data-underlay-layer], [data-underlay-panel]", { xPercent: 100 });
       gsap.set("[data-menu-item-label]", { yPercent: 140, rotate: 10 });
       gsap.set("[data-menu-number]", { opacity: 0 });
@@ -129,7 +146,15 @@ export default function UnderlayMenu() {
     });
   }, []);
 
+  // Open/close driven by the open-state changes only. The initial mount is
+  // skipped on purpose: running playClose() for an already-closed menu would
+  // leave a residual inline transform on the panel (visible in reduced-motion
+  // sessions, where the class-based show/hide must own the layout).
+  const prevOpenRef = useRef(false);
   useEffect(() => {
+    const wasOpen = prevOpenRef.current;
+    prevOpenRef.current = menuOpen;
+    if (menuOpen === wasOpen) return; // mount + no-op toggles
     if (reduced) return;
     if (menuOpen) {
       playOpen();

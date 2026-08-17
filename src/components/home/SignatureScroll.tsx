@@ -147,7 +147,7 @@ export default function SignatureScroll() {
         start: "top top",
         end: "+=300%",
         pin: true,
-        scrub: true,
+        scrub: 1,
         anticipatePin: 1,
       });
     },

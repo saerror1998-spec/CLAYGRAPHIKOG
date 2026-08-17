@@ -56,34 +56,43 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
     else lenis.start();
   }, [menuOpen, lenis]);
 
-  // Foreground stage shift (desktop only, no reduced motion).
+  // Foreground stage shift (desktop only). The shift is layout-critical —
+  // without it the underlay would stay hidden behind the stage — so it also
+  // applies in reduced-motion mode, but INSTANTLY (no tween).
   // IMPORTANT: never leave a residual transform on the stage when closed —
   // a transformed ancestor becomes the containing block for fixed elements
   // and breaks ScrollTrigger's fixed pinning inside the stage.
   const stageMountedRef = useRef(false);
   useEffect(() => {
     const stage = stageRef.current;
-    if (!stage || reduced) return;
+    if (!stage) return;
     if (!stageMountedRef.current) {
       stageMountedRef.current = true;
       return; // skip the initial no-op animation
     }
     if (window.innerWidth < 1024) return;
 
+    const scale = 0.94;
+    const vw = window.innerWidth;
+    const gap = 28;
+    const stageW = vw - STAGE_PADDING * 2;
+    const pull = (stageW * (1 - scale)) / 2;
+    const shift = MENU_WIDTH + gap - STAGE_PADDING - pull;
+
     if (menuOpen) {
-      const scale = 0.94;
-      const vw = window.innerWidth;
-      const gap = 28;
-      const stageW = vw - STAGE_PADDING * 2;
-      const pull = (stageW * (1 - scale)) / 2;
-      const shift = MENU_WIDTH + gap - STAGE_PADDING - pull;
-      gsap.to(stage, {
-        x: -shift,
-        scale,
-        duration: 0.8,
-        ease: "power4.inOut",
-        transformOrigin: "50% 50%",
-      });
+      if (reduced) {
+        gsap.set(stage, { x: -shift, scale, transformOrigin: "50% 50%" });
+      } else {
+        gsap.to(stage, {
+          x: -shift,
+          scale,
+          duration: 0.8,
+          ease: "power4.inOut",
+          transformOrigin: "50% 50%",
+        });
+      }
+    } else if (reduced) {
+      gsap.set(stage, { clearProps: "transform" });
     } else {
       gsap.to(stage, {
         x: 0,
