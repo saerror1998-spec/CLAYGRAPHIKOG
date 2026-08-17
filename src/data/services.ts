@@ -2,7 +2,10 @@ export interface Service {
   slug: string;
   number: string;
   title: string;
+  /** Short line used on cards and the index. */
   positioning: string;
+  /** Longer description used on the detail page. */
+  description: string;
   capabilities: string[];
   relatedWork: string[];
 }
@@ -12,41 +15,77 @@ export const services: Service[] = [
     slug: "strategy-identity",
     number: "01",
     title: "Strategy & Identity",
-    positioning:
-      "Brands that start with a clear strategy end up looking inevitable. We define the position, then build the identity that makes it visible.",
-    capabilities: ["Brand Strategy", "Logo & Visual Identity", "Brand Guidelines", "Identity Systems"],
+    positioning: "Build a brand people understand, remember and trust.",
+    description:
+      "We create strategic visual identities that give businesses a clear, professional and consistent presence across every customer touchpoint.",
+    capabilities: [
+      "Brand Strategy",
+      "Positioning",
+      "Logo Design",
+      "Visual Identity",
+      "Color Systems",
+      "Typography",
+      "Brand Guidelines",
+      "Brand Applications",
+    ],
     relatedWork: ["brand-book-system"],
   },
   {
     slug: "websites-ux",
     number: "02",
     title: "Websites & UX",
-    positioning:
-      "Your website is your hardest-working asset. We design and build digital experiences that look clear, credible and built to convert.",
-    capabilities: ["Website Design", "Landing Pages", "UI / UX", "Web Development", "WordPress / Webflow"],
+    positioning: "Digital experiences designed for clarity, credibility and action.",
+    description:
+      "We design modern responsive websites that communicate your offer clearly, strengthen trust and guide users toward meaningful action.",
+    capabilities: [
+      "Website Strategy",
+      "Website Design",
+      "Landing Pages",
+      "UI / UX Design",
+      "Responsive Design",
+      "Website Development",
+      "Conversion Structure",
+      "Basic On-Page SEO",
+      "Performance Optimization",
+    ],
     relatedWork: ["web-platform-concept"],
   },
   {
     slug: "content-systems",
     number: "03",
     title: "Content Systems",
-    positioning:
-      "Content is a system, not a task. We build repeatable creative systems that keep your brand consistent across every channel.",
-    capabilities: ["Social Media Design", "Campaign Creative", "Content Systems", "Marketing Collateral"],
+    positioning: "Consistent creative systems for brands that need to stay visible.",
+    description:
+      "We build repeatable content systems that help brands communicate consistently without redesigning everything from scratch for every post or campaign.",
+    capabilities: [
+      "Social Media Design",
+      "Instagram Content Systems",
+      "Carousels",
+      "Campaign Creative",
+      "Content Templates",
+      "Marketing Collateral",
+      "Launch Content",
+      "Digital Advertising Creative",
+    ],
     relatedWork: ["content-system-concept"],
   },
   {
     slug: "creative-direction",
     number: "04",
     title: "Creative Direction",
-    positioning:
-      "When the message matters, someone has to own the standard. We direct the work so every asset lands with the same intent.",
+    positioning: "Creative direction that keeps every brand touchpoint working together.",
+    description:
+      "From presentations and launch campaigns to digital products and brand applications, we extend the visual system into practical assets built for real business use.",
     capabilities: [
+      "Creative Direction",
       "Presentation Design",
       "Packaging",
       "Digital Products",
+      "Lead Magnets",
+      "eBooks",
       "Launch Assets",
-      "Creative Direction",
+      "Campaign Systems",
+      "Digital Product UI",
     ],
     relatedWork: ["brand-book-system"],
   },

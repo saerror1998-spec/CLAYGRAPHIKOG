@@ -4,6 +4,7 @@ import PageHero from "@/components/motion/PageHero";
 export const metadata: Metadata = {
   title: "Terms",
   description: "Terms of use for the Clay Graphik website.",
+  alternates: { canonical: "/terms" },
 };
 
 const SECTIONS: Array<{ title: string; body: string }> = [

@@ -3,44 +3,22 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import PageHero from "@/components/motion/PageHero";
 import { services } from "@/data/services";
+import { ctas, principles, seo, site } from "@/data/siteContent";
 
 export const metadata: Metadata = {
-  title: "About",
-  description:
-    "Clay Graphik is an independent creative studio in Dubai — small studio, serious craft. Working with founders, service businesses and growing brands across the UAE, GCC and beyond.",
+  title: seo.about.title,
+  description: seo.about.description,
+  alternates: { canonical: "/about" },
 };
-
-const PRINCIPLES = [
-  {
-    number: "01",
-    title: "Clarity before decoration",
-    copy: "If it doesn't help the message land, it doesn't ship.",
-  },
-  {
-    number: "02",
-    title: "Strategy drives design",
-    copy: "The best work is decided before a single pixel moves.",
-  },
-  {
-    number: "03",
-    title: "Built to convert",
-    copy: "Beautiful is a baseline. Work must also move the business.",
-  },
-  {
-    number: "04",
-    title: "One standard, everywhere",
-    copy: "The same care goes into a single social post and a full identity.",
-  },
-];
 
 export default function AboutPage() {
   return (
     <>
       <PageHero
-        eyebrow="ABOUT"
-        title="SMALL STUDIO."
-        titleAccent="SERIOUS CRAFT."
-        support="Clay Graphik is an independent creative studio in Dubai, working with founders, service businesses and growing brands across the UAE, GCC and beyond."
+        eyebrow="ABOUT CLAY GRAPHIK"
+        title="A STUDIO"
+        titleAccent="BUILT FOR GROWTH."
+        support="Clay Graphik is an independent creative studio in Dubai helping businesses build clearer brands, stronger websites and consistent digital experiences."
       />
 
       <div className="px-6 pb-24 sm:px-8 lg:px-10 lg:pb-32">
@@ -48,12 +26,16 @@ export default function AboutPage() {
           <div className="lg:col-span-7">
             <p className="label text-offwhite/50">POSITIONING</p>
             <h2 className="mt-6 max-w-2xl text-[clamp(1.7rem,3.6vw,2.8rem)] font-medium uppercase leading-[1.05] tracking-[-0.02em] text-offwhite">
-              STRATEGIC DESIGN. CONVERSION FOCUSED. GROWTH DRIVEN.
+              {site.tagline}
             </h2>
             <p className="mt-8 max-w-2xl text-base leading-relaxed text-softgray sm:text-lg">
-              We build brands and digital experiences for businesses that take
-              their growth seriously. The work is designed to do three things
-              in order: create clarity, build trust, and move people to act.
+              We combine strategic thinking with visual design and digital
+              execution so brand identity, websites and content work as one
+              connected system.
+            </p>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-softgray sm:text-lg">
+              We work with founders, service businesses, startups and growing
+              brands across the UAE, GCC and beyond.
             </p>
           </div>
 
@@ -70,8 +52,12 @@ export default function AboutPage() {
 
         <div className="mt-24">
           <p className="label text-offwhite/50">PRINCIPLES</p>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-softgray">
+            Strong design should make a business easier to understand, easier
+            to trust and easier to choose.
+          </p>
           <div className="mt-8 border-t border-white/[0.08]">
-            {PRINCIPLES.map((p) => (
+            {principles.map((p) => (
               <div
                 key={p.number}
                 className="grid grid-cols-1 gap-4 border-b border-white/[0.08] py-8 md:grid-cols-12"
@@ -126,16 +112,16 @@ export default function AboutPage() {
           <div className="lg:col-span-5">
             <div className="border border-white/[0.08] bg-white/[0.02] p-8 lg:p-10">
               <h3 className="text-2xl font-medium uppercase tracking-tight text-offwhite">
-                START A PROJECT
+                {ctas.startProject}
               </h3>
               <p className="mt-3 max-w-sm text-sm leading-relaxed text-softgray">
-                Based in Dubai, serving the UAE, GCC and global markets.
+                Based in {site.location}, serving the {site.serviceArea} markets.
               </p>
               <Link
                 href="/contact"
                 className="group mt-8 inline-flex items-center gap-3 bg-lime px-7 py-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-carbon transition-colors duration-300 hover:bg-offwhite"
               >
-                ABOUT THE STUDIO
+                {ctas.startProject}
                 <ArrowUpRight
                   aria-hidden="true"
                   className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"

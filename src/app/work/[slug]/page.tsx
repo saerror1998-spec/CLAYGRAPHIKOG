@@ -23,14 +23,15 @@ export async function generateMetadata({
   return {
     title: project.title,
     description: project.summary,
+    alternates: { canonical: `/work/${project.slug}` },
   };
 }
 
 const SECTION_LABELS: Array<{ label: string; title: string }> = [
   { label: "OVERVIEW", title: "overview" },
-  { label: "CHALLENGE", title: "challenge" },
+  { label: "OBJECTIVE", title: "objective" },
   { label: "APPROACH", title: "approach" },
-  { label: "VISUAL SYSTEM", title: "visualSystem" },
+  { label: "SYSTEM", title: "system" },
 ];
 
 export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
@@ -60,7 +61,21 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
         <div className="mt-8 flex flex-wrap items-center gap-6">
           <p className="label-lime">{project.category}</p>
           <p className="label">{project.year}</p>
+          {project.status === "concept" ? (
+            <span className="label border border-white/12 px-2.5 py-1 text-offwhite/50">
+              STUDIO CONCEPT
+            </span>
+          ) : null}
         </div>
+        {project.services.length ? (
+          <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2">
+            {project.services.map((s) => (
+              <p key={s} className="label text-offwhite/40">
+                {s}
+              </p>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       <div className="px-6 pt-10 sm:px-8 lg:px-10">
@@ -96,7 +111,7 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
             ))}
 
             <div className="border-t border-white/[0.08] pt-8">
-              <p className="label text-lime">DELIVERABLES / OUTCOME</p>
+              <p className="label text-lime">DELIVERABLES</p>
               <ul className="mt-5 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
                 {project.deliverables.map((d) => (
                   <li key={d} className="flex items-start gap-3 text-base text-softgray">
@@ -105,6 +120,13 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
                   </li>
                 ))}
               </ul>
+            </div>
+
+            <div className="border-t border-white/[0.08] pt-8">
+              <p className="label text-lime">OUTCOME</p>
+              <p className="mt-5 max-w-2xl text-base leading-relaxed text-softgray sm:text-lg">
+                {project.outcome}
+              </p>
             </div>
           </div>
         </div>

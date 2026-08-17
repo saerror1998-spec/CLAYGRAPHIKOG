@@ -442,7 +442,7 @@ for (const href of NAV_ROUTES) {
     const a = [...document.querySelectorAll("a[href]")].find((el) => el.getAttribute("href") === h);
     if (a) a.click();
   }, href);
-  await sleep(1500);
+  await sleep(2200);
   const landed = page.url().endsWith(href === "/" ? "/" : href);
   check(`transition: ${href} navigates`, landed);
   check(
@@ -523,6 +523,10 @@ check(
   "work: hero + grid render",
   (await pp.getByText("OUR WORK.").count()) > 0 && (await pp.locator("article").count()) === 3,
 );
+check(
+  "work: concept projects labelled STUDIO CONCEPT",
+  (await pp.getByText("STUDIO CONCEPT").count()) === 3,
+);
 await pp.getByRole("button", { name: "WEB" }).click();
 await sleep(600);
 check(
@@ -537,7 +541,8 @@ await sleep(1800);
 check(
   "work/[slug]: case study renders",
   (await pp.getByText("Brand Book System").count()) > 0 &&
-    (await pp.getByText("CHALLENGE").count()) > 0 &&
+    (await pp.getByText("OBJECTIVE").count()) > 0 &&
+    (await pp.getByText("OUTCOME").count()) > 0 &&
     (await pp.getByText("NEXT PROJECT").count()) > 0,
 );
 
@@ -545,25 +550,37 @@ check(
 await pp.goto(BASE + "/services", { waitUntil: "load" });
 await sleep(1800);
 check(
-  "services: index renders 4 groups",
-  (await pp.getByText("SERVICES.").count()) > 0 &&
+  "services: index renders hero + 4 groups",
+  (await pp.getByText("BUILT TO MOVE BUSINESS.").count()) > 0 &&
     (await pp.getByText("Websites & UX").count()) > 0 &&
     (await pp.getByText("Creative Direction").count()) > 0,
+);
+check(
+  "services: WHY IT MATTERS + FAQ present",
+  (await pp.getByText("GOOD BUSINESSES").count()) > 0 &&
+    (await pp.getByText("What services does Clay Graphik offer?").count()) > 0,
+);
+check(
+  "services: no unverified metric claims",
+  (await pp.getByText(/98%|250\+|3\.2x|42\.1k|\$84k/i).count()) === 0,
 );
 await pp.goto(BASE + "/services/strategy-identity", { waitUntil: "load" });
 await sleep(1800);
 check(
   "services/[slug]: detail renders capabilities",
   (await pp.getByText("Strategy & Identity").count()) > 0 &&
-    (await pp.getByText("Brand Guidelines").count()) > 0,
+    (await pp.getByText("Brand Guidelines").count()) > 0 &&
+    (await pp.getByText("Positioning").count()) > 0,
 );
 
 // /about
 await pp.goto(BASE + "/about", { waitUntil: "load" });
 await sleep(1800);
 check(
-  "about: renders",
-  (await pp.getByText("SERIOUS CRAFT.").count()) > 0 &&
+  "about: renders new positioning",
+  (await pp.getByText("A STUDIO").count()) > 0 &&
+    (await pp.getByText("BUILT FOR GROWTH.").count()) > 0 &&
+    (await pp.getByText("CLARITY OVER NOISE.").count()) > 0 &&
     (await pp.getByText("PRINCIPLES").count()) > 0,
 );
 
@@ -575,6 +592,29 @@ check(
   (await pp.getByText(/Tell us what you're building\. We'll get back to you with a clear next step\./).count()) >
     0 &&
     (await pp.getByText(/one business day/i).count()) === 0,
+);
+const contactInfo = await pp.evaluate(() => {
+  const t = document.body.textContent;
+  const mail = document.querySelector('a[href="mailto:connect@claygraphik.com"]');
+  const wa = document.querySelector('a[href="https://wa.me/971523412447"]');
+  const ig = document.querySelector('a[href="https://instagram.com/claygraphik"]');
+  return {
+    email: !!mail,
+    whatsapp: !!wa,
+    instagram: !!ig,
+    serving: t.includes("UAE / GCC / GLOBAL"),
+    phone: t.includes("+971 52 341 2447"),
+  };
+});
+check(
+  "contact: real contact methods present + clickable",
+  contactInfo.email && contactInfo.whatsapp && contactInfo.instagram && contactInfo.serving && contactInfo.phone,
+  JSON.stringify(contactInfo),
+);
+check(
+  "contact: form offers Multiple Services + FAQ present",
+  (await pp.getByText("Multiple Services").count()) > 0 &&
+    (await pp.getByText("How much does a project cost?").count()) > 0,
 );
 await pp.getByRole("button", { name: /SEND MESSAGE/ }).click();
 await sleep(300);
@@ -592,6 +632,64 @@ check(
   "contact: unconfigured provider shows honest error",
   (await pp.getByText(/not connected to an email provider/i).count()) > 0,
 );
+
+// Footer + SEO on the home page
+await pp.goto(BASE + "/", { waitUntil: "load" });
+await sleep(2000);
+check(
+  "footer: tagline + copyright",
+  (await pp.getByText("Strategic Design. Conversion Focused. Growth Driven.").count()) > 0 &&
+    (await pp.getByText("© 2026 Clay Graphik. All rights reserved.").count()) > 0,
+);
+const seoChecks = await pp.evaluate(() => {
+  const canonical = document.querySelector('link[rel="canonical"]')?.getAttribute("href") ?? "";
+  const og = document.querySelector('meta[property="og:image"]')?.getAttribute("content") ?? "";
+  const ld = [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent);
+  const hasOrg = ld.some((t) => t.includes('"ProfessionalService"') && t.includes("claygraphik.com"));
+  const title = document.title;
+  const desc = document.querySelector('meta[name="description"]')?.getAttribute("content") ?? "";
+  return { canonical, og, hasOrg, title, desc };
+});
+check(
+  "seo: home metadata + canonical + OG + JSON-LD",
+  seoChecks.canonical.replace(/\/$/, "") === "https://claygraphik.com" &&
+    seoChecks.og.includes("https://claygraphik.com/og.png") &&
+    seoChecks.hasOrg &&
+    seoChecks.title.includes("Clay Graphik — Creative Studio in Dubai") &&
+    seoChecks.desc.includes("independent creative studio in Dubai"),
+  JSON.stringify(seoChecks),
+);
+const seoRoutes = await Promise.all(
+  ["/work", "/services", "/about", "/contact"].map(async (r) => {
+    const resp = await pp.request.get(BASE + r);
+    const body = await resp.text();
+    return { r, title: (body.match(/<title>([^<]*)<\/title>/) || [])[1] || "" };
+  }),
+);
+check(
+  "seo: per-route titles",
+  seoRoutes.every((x) => x.title.length > 0 && !x.title.includes("SERVICES.")),
+  JSON.stringify(seoRoutes.map((x) => x.title)),
+);
+
+// sitemap + robots + og asset
+const sm = await pp.request.get(BASE + "/sitemap.xml");
+const smBody = await sm.text();
+check(
+  "seo: sitemap lists public routes on canonical domain",
+  sm.status() === 200 &&
+    smBody.includes("https://claygraphik.com/") &&
+    smBody.includes("/work/brand-book-system") &&
+    smBody.includes("/services/websites-ux"),
+);
+const rb = await pp.request.get(BASE + "/robots.txt");
+const rbBody = await rb.text();
+check(
+  "seo: robots.txt points to canonical sitemap",
+  rb.status() === 200 && rbBody.includes("https://claygraphik.com/sitemap.xml"),
+);
+const ogResp = await pp.request.get(BASE + "/og.png");
+check("seo: og.png served", ogResp.status() === 200 && Number(ogResp.headers()["content-length"] || 0) > 5000);
 
 // legal + 404
 await pp.goto(BASE + "/privacy", { waitUntil: "load" });

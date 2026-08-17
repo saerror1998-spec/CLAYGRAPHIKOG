@@ -90,7 +90,14 @@ export default function WorkGrid() {
                   <h2 className="text-2xl font-medium tracking-tight text-offwhite transition-colors duration-300 group-hover:text-lime sm:text-3xl">
                     {project.title}
                   </h2>
-                  <p className="label mt-2">{project.category}</p>
+                  <div className="mt-2 flex flex-wrap items-center gap-3">
+                    <p className="label">{project.category}</p>
+                    {project.status === "concept" ? (
+                      <span className="label border border-white/12 px-2 py-0.5 text-offwhite/50">
+                        STUDIO CONCEPT
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
                 <p className="label mt-1">{project.year}</p>
               </div>

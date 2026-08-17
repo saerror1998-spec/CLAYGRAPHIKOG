@@ -4,29 +4,7 @@ import { useRef } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
 import SectionLabel from "./SectionLabel";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
-
-const PROCESS = [
-  {
-    number: "01",
-    title: "DISCOVER",
-    copy: "Understand the business, audience and objective.",
-  },
-  {
-    number: "02",
-    title: "DEFINE",
-    copy: "Turn the strategy into a clear creative direction.",
-  },
-  {
-    number: "03",
-    title: "DESIGN",
-    copy: "Build the identity, experience and content system.",
-  },
-  {
-    number: "04",
-    title: "DELIVER",
-    copy: "Launch a consistent system ready for real-world use.",
-  },
-];
+import { processSteps } from "@/data/siteContent";
 
 /**
  * 05 / PROCESS — number reveal, divider-line drawing, heading reveal and
@@ -83,7 +61,7 @@ export default function ProcessSection() {
       </h2>
 
       <ol className="mt-14 lg:mt-20">
-        {PROCESS.map((step) => (
+        {processSteps.map((step) => (
           <li
             key={step.number}
             data-process-row

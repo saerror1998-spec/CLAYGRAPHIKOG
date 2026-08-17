@@ -6,20 +6,14 @@ import Image from "next/image";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { useSite } from "./site-context";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
+import { navigation, socials } from "@/data/siteContent";
 
-const MENU_ITEMS = [
-  { label: "Home", href: "/", number: "01" },
-  { label: "Work", href: "/work", number: "02" },
-  { label: "Services", href: "/services", number: "03" },
-  { label: "About", href: "/about", number: "04" },
-  { label: "Contact", href: "/contact", number: "05" },
-];
+const MENU_ITEMS = navigation.map((item, i) => ({
+  ...item,
+  number: `0${i + 1}`,
+}));
 
-const SOCIALS = [
-  { label: "Instagram", href: "https://instagram.com/claygraphik", external: true },
-  { label: "Email", href: "mailto:connect@claygraphik.com", external: false },
-  { label: "WhatsApp", href: "https://wa.me/971523412447", external: true },
-];
+const SOCIALS = socials;
 
 /**
  * Underlay navigation revealed from the right beneath the foreground stage.

@@ -22,7 +22,8 @@ export async function generateMetadata({
   if (!service) return { title: "Services" };
   return {
     title: service.title,
-    description: service.positioning,
+    description: service.description,
+    alternates: { canonical: `/services/${service.slug}` },
   };
 }
 
@@ -41,7 +42,7 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
         eyebrow={`SERVICE ${service.number}`}
         title={service.title}
         titleAccent=""
-        support={service.positioning}
+        support={service.description}
       />
 
       <div className="px-6 pb-24 sm:px-8 lg:px-10 lg:pb-32">
@@ -67,9 +68,9 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
             <p className="label text-offwhite/50">HOW IT WORKS</p>
             <p className="mt-6 max-w-sm text-base leading-relaxed text-softgray">
               Every engagement starts with a conversation about the business,
-              the audience and the objective — then the strategy, design and
-              build follow a clear, documented process. You always know what
-              is happening, why, and what comes next.
+              the audience and the objective. The strategy, design and build
+              then follow a clear, documented process — so you always know
+              what is happening, why, and what comes next.
             </p>
 
             <Link

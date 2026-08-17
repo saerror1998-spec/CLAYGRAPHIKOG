@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import PageHero from "@/components/motion/PageHero";
 import WorkGrid from "@/components/work/WorkGrid";
+import { seo } from "@/data/siteContent";
 
 export const metadata: Metadata = {
-  title: "Work",
-  description:
-    "Selected branding, web and digital creative by Clay Graphik — an independent creative studio in Dubai.",
+  title: seo.work.title,
+  description: seo.work.description,
+  alternates: { canonical: "/work" },
 };
 
 export default function WorkPage() {

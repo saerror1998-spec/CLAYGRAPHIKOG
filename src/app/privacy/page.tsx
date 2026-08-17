@@ -4,6 +4,7 @@ import PageHero from "@/components/motion/PageHero";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description: "How Clay Graphik collects, uses and protects your information.",
+  alternates: { canonical: "/privacy" },
 };
 
 const SECTIONS: Array<{ title: string; body: string }> = [
@@ -24,8 +25,8 @@ const SECTIONS: Array<{ title: string; body: string }> = [
     body: "We keep enquiry details only as long as needed to handle your request and, if we work together, for the duration of our working relationship. You may request deletion at any time.",
   },
   {
-    title: "5. Analytics",
-    body: "The website may use privacy-respecting analytics to understand how pages are used. This data is aggregated and does not identify individual visitors.",
+    title: "5. Analytics and cookies",
+    body: "The website does not use third-party analytics, advertising trackers or tracking cookies. Browsing the site does not collect personal information about you.",
   },
   {
     title: "6. Your rights",

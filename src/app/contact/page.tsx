@@ -1,19 +1,26 @@
 import type { Metadata } from "next";
 import PageHero from "@/components/motion/PageHero";
 import ContactForm from "@/components/contact/ContactForm";
+import FAQ from "@/components/global/FAQ";
+import { seo, site } from "@/data/siteContent";
 
 export const metadata: Metadata = {
-  title: "Contact",
-  description:
-    "Start a project with Clay Graphik — independent creative studio in Dubai. Strategy & Identity, Websites & UX, Content Systems, Creative Direction.",
+  title: seo.contact.title,
+  description: seo.contact.description,
+  alternates: { canonical: "/contact" },
 };
 
 const DIRECT = [
-  { label: "EMAIL", value: "connect@claygraphik.com", href: "mailto:connect@claygraphik.com" },
-  { label: "PHONE / WHATSAPP", value: "+971 52 341 2447", href: "https://wa.me/971523412447" },
-  { label: "INSTAGRAM", value: "@claygraphik", href: "https://instagram.com/claygraphik" },
-  { label: "WEBSITE", value: "claygraphik.com", href: "https://claygraphik.com" },
-  { label: "LOCATION", value: "Dubai, UAE", href: null },
+  { label: "EMAIL", value: site.email, href: `mailto:${site.email}` },
+  {
+    label: "PHONE / WHATSAPP",
+    value: site.phoneDisplay,
+    href: site.whatsappUrl,
+  },
+  { label: "INSTAGRAM", value: site.instagramHandle, href: site.instagramUrl },
+  { label: "WEBSITE", value: "claygraphik.com", href: site.website },
+  { label: "LOCATION", value: site.location, href: null },
+  { label: "SERVING", value: site.serviceArea, href: null },
 ];
 
 export default function ContactPage() {
@@ -55,6 +62,13 @@ export default function ContactPage() {
                 ))}
               </ul>
             </div>
+          </div>
+        </div>
+
+        <div className="mt-24 lg:mt-32">
+          <p className="label text-offwhite/50">FAQ</p>
+          <div className="mt-8 max-w-3xl">
+            <FAQ />
           </div>
         </div>
       </div>

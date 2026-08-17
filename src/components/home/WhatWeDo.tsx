@@ -2,6 +2,7 @@
 
 import ScrollReveal from "@/components/motion/ScrollReveal";
 import SectionLabel from "./SectionLabel";
+import { whatWeDoCopy } from "@/data/siteContent";
 
 /**
  * 01 / WHAT WE DO — the statement resolves word-by-word (opacity, blur,
@@ -20,13 +21,15 @@ export default function WhatWeDo() {
             baseRotation={2}
             className="inline"
           >
-            ONE PARTNER FOR BRAND, WEB, CONTENT AND BUSINESS GROWTH.
+            {whatWeDoCopy.headline}
           </ScrollReveal>
         </h2>
 
         <p className="mt-12 max-w-xl text-base leading-relaxed text-softgray sm:text-lg">
-          We help businesses turn ideas into clear brands, high-performing
-          digital experiences and consistent creative systems.
+          {whatWeDoCopy.support}
+        </p>
+        <p className="mt-4 max-w-xl text-base leading-relaxed text-softgray/70 sm:text-lg">
+          {whatWeDoCopy.secondary}
         </p>
       </div>
     </section>

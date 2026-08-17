@@ -8,6 +8,7 @@ import Aurora from "@/components/motion/Aurora";
 import ShinyText from "@/components/motion/ShinyText";
 import { useSite } from "@/components/global/site-context";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
+import { ctas, heroCopy } from "@/data/siteContent";
 
 /**
  * 00 / HERO — one master GSAP timeline drives the whole entrance
@@ -180,7 +181,7 @@ export default function Hero() {
 
       <div className="relative z-10 flex flex-1 flex-col justify-end pb-24 pt-28 lg:pb-28">
         <p data-hero-eyebrow className="label-lime">
-          INDEPENDENT CREATIVE STUDIO — DUBAI
+          {heroCopy.eyebrow}
         </p>
 
         <h1 className="mt-5 font-semibold uppercase leading-[0.95] tracking-[-0.03em] text-offwhite sm:mt-6">
@@ -209,23 +210,34 @@ export default function Hero() {
             data-hero-support
             className="max-w-md text-base leading-relaxed text-softgray sm:text-lg"
           >
-            Strategic branding, web design and digital creative
-            <br className="hidden sm:block" /> for businesses that want to look clear, credible
-            <br className="hidden sm:block" /> and built to grow.
+            {heroCopy.support}
           </p>
 
-          <Link
-            href="/#work"
-            data-hero-cta
-            onClick={handleCtaClick}
-            className="group inline-flex w-fit items-center gap-3 border border-lime/70 px-7 py-4 text-[11px] font-medium uppercase tracking-[0.18em] text-lime transition-colors duration-300 hover:bg-lime hover:text-carbon"
-          >
-            VIEW SELECTED WORK
-            <ArrowUpRight
-              aria-hidden="true"
-              className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-            />
-          </Link>
+          <div className="flex flex-col items-start gap-6">
+            <Link
+              href="/#work"
+              data-hero-cta
+              onClick={handleCtaClick}
+              className="group inline-flex w-fit items-center gap-3 border border-lime/70 px-7 py-4 text-[11px] font-medium uppercase tracking-[0.18em] text-lime transition-colors duration-300 hover:bg-lime hover:text-carbon"
+            >
+              {ctas.viewSelectedWork}
+              <ArrowUpRight
+                aria-hidden="true"
+                className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              />
+            </Link>
+            <Link
+              href="/contact"
+              data-hero-secondary
+              className="group inline-flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-softgray transition-colors duration-300 hover:text-lime"
+            >
+              {ctas.startProject}
+              <ArrowUpRight
+                aria-hidden="true"
+                className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              />
+            </Link>
+          </div>
         </div>
       </div>
 

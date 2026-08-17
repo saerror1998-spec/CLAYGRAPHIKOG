@@ -33,21 +33,23 @@ export default function InitialLoader({ onDone }: { onDone: () => void }) {
         },
       });
 
-      // Total ~1.3s: quick logo reveal → lime sweep → stage lifts immediately.
+      // Total ~1.05s: quick logo reveal → lime sweep → stage lifts immediately.
+      // The extra headroom keeps the whole experience (incl. hydration) inside
+      // the 1.2–1.5s target on slower machines.
       tl.fromTo(
         "[data-loader-mark]",
         { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.25, ease: "power3.out" },
+        { opacity: 1, y: 0, duration: 0.22, ease: "power3.out" },
         0,
       )
         .fromTo(
           "[data-loader-line]",
           { scaleX: 0 },
-          { scaleX: 1, duration: 0.4, ease: "power4.inOut" },
-          0.2,
+          { scaleX: 1, duration: 0.35, ease: "power4.inOut" },
+          0.15,
         )
-        .add(() => doneRef.current(), 0.85)
-        .to(root, { yPercent: -100, duration: 0.45, ease: "power4.inOut" }, 0.85);
+        .add(() => doneRef.current(), 0.7)
+        .to(root, { yPercent: -100, duration: 0.35, ease: "power4.inOut" }, 0.7);
 
       return () => {
         tl.kill();

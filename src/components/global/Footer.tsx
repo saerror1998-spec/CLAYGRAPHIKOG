@@ -1,19 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-
-const MENU = [
-  { label: "Home", href: "/" },
-  { label: "Work", href: "/work" },
-  { label: "Services", href: "/services" },
-  { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
-];
-
-const CONNECT = [
-  { label: "Instagram", href: "https://instagram.com/claygraphik", external: true },
-  { label: "Email", href: "mailto:connect@claygraphik.com", external: false },
-  { label: "WhatsApp", href: "https://wa.me/971523412447", external: true },
-];
+import { navigation, site, socials } from "@/data/siteContent";
 
 export default function Footer() {
   return (
@@ -28,14 +15,14 @@ export default function Footer() {
             className="mb-6 h-6 w-auto"
           />
           <p className="max-w-[260px] text-sm leading-relaxed text-softgray">
-            Independent creative studio for brands that refuse to blend in.
+            {site.tagline}
           </p>
         </div>
 
         <nav aria-label="Footer menu">
           <h3 className="label mb-5 text-offwhite/50">MENU</h3>
           <ul className="space-y-3">
-            {MENU.map((item) => (
+            {navigation.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
@@ -51,7 +38,7 @@ export default function Footer() {
         <div>
           <h3 className="label mb-5 text-offwhite/50">CONNECT</h3>
           <ul className="space-y-3">
-            {CONNECT.map((item) => (
+            {socials.map((item) => (
               <li key={item.label}>
                 <a
                   href={item.href}
@@ -68,9 +55,9 @@ export default function Footer() {
 
         <div>
           <h3 className="label mb-5 text-offwhite/50">LOCATION</h3>
-          <p className="text-sm text-softgray">Dubai, UAE</p>
+          <p className="text-sm text-softgray">{site.location}</p>
           <h3 className="label mb-3 mt-8 text-offwhite/50">SERVING</h3>
-          <p className="text-sm text-softgray">UAE / GCC / GLOBAL</p>
+          <p className="text-sm text-softgray">{site.serviceArea}</p>
         </div>
       </div>
 
@@ -83,7 +70,7 @@ export default function Footer() {
             Terms
           </Link>
         </div>
-        <p className="label text-offwhite/40">© Clay Graphik</p>
+        <p className="label text-offwhite/40">© 2026 Clay Graphik. All rights reserved.</p>
       </div>
     </footer>
   );
