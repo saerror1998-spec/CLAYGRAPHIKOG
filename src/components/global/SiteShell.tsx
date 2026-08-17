@@ -14,7 +14,6 @@ import RouteTransition from "./RouteTransition";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 
 const MENU_WIDTH = 400;
-const STAGE_PADDING = 24;
 
 /**
  * The Clay Graphik canvas:
@@ -72,23 +71,37 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
     }
     if (window.innerWidth < 1024) return;
 
-    const scale = 0.94;
+    // Open-state composition: the stage reframes as a designed physical
+    // object — it shrinks slightly and pulls left just enough to expose the
+    // full underlay panel plus a small canvas gap, WITHOUT dragging the whole
+    // stage off-screen. The stage's right (rounded) edge lands at
+    // viewport − panel − gap; its left edge stays far enough right that
+    // centered content (the giant hero headings) is never chopped.
+    // The stage reframes as a designed physical object. The scale + shift
+    // are solved together so the stage's right (rounded) edge lands exactly
+    // at viewport − panel − gap (the underlay is never covered) while the
+    // giant hero heading stays inside the viewport instead of being chopped
+    // off the left edge. scale applies to the FULL stage element width.
+    const scale = 0.7;
     const vw = window.innerWidth;
-    const gap = 28;
-    const stageW = vw - STAGE_PADDING * 2;
-    const pull = (stageW * (1 - scale)) / 2;
-    const shift = MENU_WIDTH + gap - STAGE_PADDING - pull;
+    const gap = 24;
+    const shift = MENU_WIDTH + gap - (vw * (1 - scale)) / 2;
 
     if (menuOpen) {
+      // Origin at the stage's TOP-CENTER: the stage reframes in place. A
+      // center origin would scale the full-page-height stage about its
+      // vertical midpoint, dropping its top thousands of pixels below the
+      // viewport (the page appears to jump and the first screen shows the
+      // bare canvas instead of the stage).
       if (reduced) {
-        gsap.set(stage, { x: -shift, scale, transformOrigin: "50% 50%" });
+        gsap.set(stage, { x: -shift, scale, transformOrigin: "50% 0%" });
       } else {
         gsap.to(stage, {
           x: -shift,
           scale,
           duration: 0.8,
           ease: "power4.inOut",
-          transformOrigin: "50% 50%",
+          transformOrigin: "50% 0%",
         });
       }
     } else if (reduced) {

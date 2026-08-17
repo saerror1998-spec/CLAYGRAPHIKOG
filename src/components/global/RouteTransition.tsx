@@ -47,11 +47,16 @@ export default function RouteTransition() {
       return;
     }
 
+    // Total ~0.62s: charcoal wipe rises from the bottom (with a thin lime
+    // edge on top), the route switches + scroll resets while fully covered,
+    // then the wipe falls back down — revealing the NEW page from the top
+    // down, so the page hero is the first thing seen. No white flash, no
+    // blank pause: the stage underneath is always the next page.
     const tl = gsap.timeline();
     tl.set(overlay, { visibility: "visible", yPercent: 100 })
-      .to(overlay, { yPercent: 0, duration: 0.32, ease: "power4.inOut" })
-      .add(() => resetScroll(), 0.34)
-      .to(overlay, { yPercent: -100, duration: 0.38, ease: "power4.inOut" }, 0.36)
+      .to(overlay, { yPercent: 0, duration: 0.28, ease: "power4.inOut" })
+      .add(() => resetScroll(), 0.3)
+      .to(overlay, { yPercent: 100, duration: 0.32, ease: "power4.inOut" }, 0.3)
       .set(overlay, { visibility: "hidden" });
 
     return () => {

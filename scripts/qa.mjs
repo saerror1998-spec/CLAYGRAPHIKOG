@@ -5,6 +5,7 @@
  * Usage: node scripts/qa.mjs [url]
  */
 import { chromium } from "playwright-core";
+import { PNG } from "pngjs";
 
 const BASE = process.argv[2] || "http://localhost:3000";
 const EDGE_CANDIDATES = [
@@ -61,6 +62,25 @@ async function menuSuite(page) {
   );
   const x = await stageX(page);
   check("menu: stage shifted left", typeof x === "number" && x < -100, `stageX=${x}`);
+  // Stage composition: panel fully visible behind a rounded stage edge,
+  // and the giant hero heading must NOT be chopped off-screen.
+  const comp = await page.evaluate(() => {
+    const stage = document.querySelector("[data-stage]").getBoundingClientRect();
+    const panel = document.querySelector("[data-underlay-panel]").getBoundingClientRect();
+    const h1 = document.querySelector("h1")?.getBoundingClientRect();
+    return {
+      stageRight: Math.round(stage.right),
+      panelLeft: Math.round(panel.left),
+      stageLeft: Math.round(stage.left),
+      h1Left: Math.round(h1.left),
+      vw: window.innerWidth,
+    };
+  });
+  check(
+    "menu: stage composition — panel clear + heading not chopped",
+    comp.panelLeft >= comp.stageRight - 2 && comp.h1Left >= 0 && comp.stageLeft > -330,
+    JSON.stringify(comp),
+  );
   const settled = await page
     .locator("[data-menu-item-label]")
     .first()
@@ -105,8 +125,12 @@ async function menuSuite(page) {
   await page.click("button[data-menu-toggle]");
   await sleep(1400);
   await page.locator("[data-underlay-panel] a[href='/work']").click();
-  await sleep(1200);
-  check("menu: route click navigates + closes", page.url().includes("/work"));
+  await sleep(2000);
+  check(
+    "menu: route click navigates + closes",
+    page.url().includes("/work"),
+    `url=${page.url()}`,
+  );
 }
 
 const browser = await launch();
@@ -118,11 +142,90 @@ page.on("console", (m) => {
 page.on("pageerror", (e) => errors.push("PAGEERROR: " + e.message));
 
 await page.goto(BASE, { waitUntil: "load" });
-await sleep(5600); // entry sequence + full hero entrance (~4.5s)
+
+const waitFor = async (fn, timeout = 6000, interval = 40) => {
+  const start = Date.now();
+  while (Date.now() - start < timeout) {
+    if (await fn()) return true;
+    await sleep(interval);
+  }
+  return false;
+};
+
+// ---- Timing: loader ~1.3s; full hero entrance ~1.7s after it reveals ----
+const tStart = Date.now();
+const loaderGone = await waitFor(() =>
+  page.evaluate(() => {
+    const el = document.querySelector('[class*="z-[60]"]');
+    return !!el && getComputedStyle(el).display === "none";
+  }),
+);
+const tLoader = Date.now() - tStart;
+check("loader: gone within 1.6s", loaderGone && tLoader <= 1600, `tLoader=${tLoader}ms`);
+
+const heroSettled = await waitFor(() =>
+  page.evaluate(() => {
+    const lines = [
+      ...document.querySelectorAll("[data-hero-line] .split-char"),
+      ...document.querySelectorAll("[data-hero-line-single]"),
+    ];
+    if (!lines.length) return false;
+    const cta = document.querySelector("[data-hero-cta]");
+    const cue = document.querySelector("[data-hero-cue]");
+    return (
+      lines.every((el) => parseFloat(getComputedStyle(el).opacity) > 0.9) &&
+      parseFloat(getComputedStyle(cta).opacity) > 0.9 &&
+      parseFloat(getComputedStyle(cue).opacity) > 0.9
+    );
+  }),
+);
+const tHero = Date.now() - tStart - tLoader;
+check(
+  "hero: entrance complete within 2.2s of loader reveal",
+  heroSettled && tHero <= 2200,
+  `tHero=${tHero}ms`,
+);
 
 check(
   "entry: loader hidden after sequence",
   await page.locator("div.z-\\[60\\]").evaluate((el) => getComputedStyle(el).display === "none"),
+);
+
+// ---- ShinyText sweep: rendered-pixel proof the highlight travels ----
+// Shine class lands ~2.8s after load; first sweep runs ~3.2s–5.4s
+// (band crosses left→right), then a ~3s rest. Samples at ~mid/late sweep
+// and in the rest window; the bright (#F4F4EE) band must move, then rest.
+const shineSample = async () => {
+  const clip = await page.locator("[data-shine]").boundingBox();
+  const buf = await page.screenshot({
+    clip: { x: Math.round(clip.x), y: Math.round(clip.y), width: Math.round(clip.width), height: Math.round(clip.height) },
+  });
+  const png = PNG.sync.read(buf);
+  let bright = 0;
+  let cx = 0;
+  for (let i = 0; i < png.data.length; i += 4) {
+    const r = png.data[i];
+    const g = png.data[i + 1];
+    if (r > 225 && g > 225) {
+      bright += 1;
+      cx += (i / 4) % png.width;
+    }
+  }
+  return { bright, cx: bright ? Math.round((cx / bright) * 10) / 10 : 0 };
+};
+await waitFor(() =>
+  page.evaluate(() => document.querySelector("[data-shine]")?.classList.contains("shine-active")),
+);
+await sleep(1150); // ~mid first sweep
+const sA = await shineSample();
+await sleep(1000); // late first sweep
+const sB = await shineSample();
+await sleep(1900); // rest window
+const sC = await shineSample();
+check(
+  "shine: bright highlight travels across text then rests",
+  sA.bright > 30 && sB.bright > 30 && sC.bright < sA.bright * 0.85 && sB.cx > sA.cx,
+  JSON.stringify({ sA, sB, sC }),
 );
 
 const overflow = await noHOverflow(page);
@@ -222,6 +325,25 @@ const sigState = () =>
     const rect = document.querySelector('[aria-label="From idea to impact"]').getBoundingClientRect();
     return { words, paths, rectTop: Math.round(rect.top), scrollY: window.scrollY };
   });
+// The active phase word must be FULLY visible — glyph-sized (≥0.7×font),
+// inside its mask, not clipped to a sliver, and spelled out completely.
+const sigWord = (i) =>
+  page.evaluate((idx) => {
+    const w = [...document.querySelectorAll("[data-sig-word]")][idx];
+    const cs = getComputedStyle(w);
+    const fs = parseFloat(cs.fontSize);
+    const r = w.getBoundingClientRect();
+    const c = w.parentElement.getBoundingClientRect();
+    return {
+      text: w.textContent.trim(),
+      fs: Math.round(fs),
+      h: Math.round(r.height),
+      w: Math.round(r.width),
+      inside: r.top >= c.top - 2 && r.bottom <= c.bottom + 2,
+      full: r.height >= fs * 0.7,
+      color: cs.color,
+    };
+  }, i);
 const scrollToY = async (y) => {
   await page.evaluate((v) => window.scrollTo(0, v), y);
   await sleep(900);
@@ -231,38 +353,108 @@ const sigEnd = sigTop + vh * 3; // pin range = 300% of the viewport
 const pct = (p) => sigTop + (sigEnd - sigTop) * p;
 await scrollToY(pct(0.02));
 const sStart = await sigState();
+const wIdea = await sigWord(0);
 check(
-  "sig: pinned at top + IDEA visible",
-  sStart.rectTop >= -4 && sStart.rectTop <= 4 && sStart.words[0] === "1.00",
-  JSON.stringify({ ...sStart, vh }),
+  "sig: pinned at top + IDEA visible + unclipped",
+  sStart.rectTop >= -4 &&
+    sStart.rectTop <= 4 &&
+    sStart.words[0] === "1.00" &&
+    wIdea.text === "IDEA" &&
+    wIdea.full &&
+    wIdea.inside,
+  JSON.stringify({ ...sStart, wIdea }),
 );
-await scrollToY(pct(0.45));
-const sMid = await sigState();
+
+// Dynamic scan across the pin range: record the dominant word and the
+// drawn-path count at each step — no assumptions about absolute timeline
+// positions (the crossfades are intentionally compressed).
+const scan = [];
+for (let p = 0.06; p <= 0.97; p += 0.03) {
+  await scrollToY(pct(p));
+  const s = await sigState();
+  const nums = s.words.map(Number);
+  const maxI = nums.indexOf(Math.max(...nums));
+  scan.push({ p: Math.round(p * 100), maxI, drawn: s.paths.filter((x) => x === "0px").length });
+}
+const firstAt = (i) => scan.find((x) => x.maxI === i)?.p ?? -1;
+const order = [0, 1, 2, 3].map((i) => firstAt(i));
 check(
-  "sig: FORM active mid-way + path1 drawn",
-  sMid.words[1] === "1.00" && sMid.paths[0] === "0px",
-  JSON.stringify(sMid),
+  "sig: sequence IDEA→FORM→DIGITAL→IMPACT in order",
+  order[0] > 0 && order[1] > order[0] && order[2] > order[1] && order[3] > order[2],
+  JSON.stringify(order),
 );
-await scrollToY(pct(0.95));
+check(
+  "sig: every phase word becomes fully dominant",
+  order.every((p) => p > 0),
+  JSON.stringify(order),
+);
+// Every word is complete + unclipped at the moment it dominates.
+const healthOk = [];
+for (let i = 0; i < 4; i++) {
+  const p = firstAt(i);
+  if (p < 0) continue;
+  await scrollToY(pct(p / 100));
+  const w = await sigWord(i);
+  healthOk.push({ i, p, ...w });
+}
+check(
+  "sig: each phase word fully visible + unclipped when active",
+  healthOk.length === 4 && healthOk.every((w) => w.text.length > 0 && w.full && w.inside),
+  JSON.stringify(healthOk),
+);
+// Final state: all paths drawn, IMPACT lime.
+await scrollToY(pct(0.97));
 const sHigh = await sigState();
+const wImp = await sigWord(3);
 check(
-  "sig: IMPACT active + all paths drawn at 95%",
-  sHigh.words[3] === "1.00" &&
-    sHigh.paths.every((p) => p === "0px") &&
-    sHigh.words[0] !== "1.00",
-  JSON.stringify(sHigh),
+  "sig: IMPACT lime + all paths drawn at end",
+  sHigh.words[3] === "1.00" && sHigh.paths.every((x) => x === "0px") && wImp.color === "rgb(204, 255, 0)",
+  JSON.stringify({ ...sHigh, wImp }),
 );
-await scrollToY(pct(0.2));
+// Reverse: scroll back down — IMPACT must leave, earlier phases return.
+await scrollToY(pct(0.15));
 const sBack = await sigState();
 check(
-  "sig: reverse scroll moves back toward IDEA",
+  "sig: reverse scroll returns toward IDEA/FORM",
   sBack.words[3] !== "1.00" && (sBack.words[0] === "1.00" || sBack.words[1] === "1.00"),
   JSON.stringify(sBack),
 );
+// No dead scroll: the scene keeps progressing — state changes must be
+// frequent AND spread across the range (no long stretch with zero change).
+const changedIdx = [];
+scan.forEach((x, i) => {
+  if (i === 0 || x.maxI !== scan[i - 1].maxI || x.drawn !== scan[i - 1].drawn) changedIdx.push(i);
+});
+const maxGap = Math.max(...changedIdx.map((v, i) => (i === 0 ? v : v - changedIdx[i - 1])));
+check(
+  "sig: no dead scroll — continuous progression",
+  changedIdx.length >= 8 && maxGap <= 10,
+  `changed=${changedIdx.length}/${scan.length} maxGap=${maxGap}`,
+);
 
-// Route transition: navigate home from /work and inspect overlay state
+// Route transitions: real client-side Link clicks across all internal
+// routes. Each must land at scrollTop 0 with no overlay stuck above the page.
 await page.goto(BASE + "/", { waitUntil: "load" });
 await sleep(1500);
+const NAV_ROUTES = ["/services", "/work", "/about", "/contact", "/"];
+for (const href of NAV_ROUTES) {
+  await page.evaluate((h) => {
+    const a = [...document.querySelectorAll("a[href]")].find((el) => el.getAttribute("href") === h);
+    if (a) a.click();
+  }, href);
+  await sleep(1500);
+  const landed = page.url().endsWith(href === "/" ? "/" : href);
+  check(`transition: ${href} navigates`, landed);
+  check(
+    `transition: ${href} lands at scrollTop 0`,
+    await page.evaluate(() => window.scrollY < 2),
+    `scrollY=${await page.evaluate(() => window.scrollY)}`,
+  );
+  check(
+    `transition: overlay hidden after ${href}`,
+    await page.locator("div.z-\\[50\\]").evaluate((el) => getComputedStyle(el).visibility === "hidden"),
+  );
+}
 check(
   "transition: overlay hidden after navigation",
   await page.locator("div.z-\\[50\\]").evaluate((el) => getComputedStyle(el).visibility === "hidden"),
@@ -375,9 +567,15 @@ check(
     (await pp.getByText("PRINCIPLES").count()) > 0,
 );
 
-// /contact — validation + honest non-success state
+// /contact — copy correction, validation + honest non-success state
 await pp.goto(BASE + "/contact", { waitUntil: "load" });
 await sleep(1800);
+check(
+  "contact: no response-time promise + new next-step copy",
+  (await pp.getByText(/Tell us what you're building\. We'll get back to you with a clear next step\./).count()) >
+    0 &&
+    (await pp.getByText(/one business day/i).count()) === 0,
+);
 await pp.getByRole("button", { name: /SEND MESSAGE/ }).click();
 await sleep(300);
 check(

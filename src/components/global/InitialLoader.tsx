@@ -33,20 +33,21 @@ export default function InitialLoader({ onDone }: { onDone: () => void }) {
         },
       });
 
+      // Total ~1.3s: quick logo reveal → lime sweep → stage lifts immediately.
       tl.fromTo(
         "[data-loader-mark]",
-        { opacity: 0, y: 26 },
-        { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" },
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.25, ease: "power3.out" },
         0,
       )
         .fromTo(
           "[data-loader-line]",
           { scaleX: 0 },
-          { scaleX: 1, duration: 0.5, ease: "power4.inOut" },
-          0.45,
+          { scaleX: 1, duration: 0.4, ease: "power4.inOut" },
+          0.2,
         )
-        .add(() => doneRef.current(), 1.0)
-        .to(root, { yPercent: -100, duration: 0.7, ease: "power4.inOut" }, 1.05);
+        .add(() => doneRef.current(), 0.85)
+        .to(root, { yPercent: -100, duration: 0.45, ease: "power4.inOut" }, 0.85);
 
       return () => {
         tl.kill();

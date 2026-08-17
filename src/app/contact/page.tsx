@@ -23,7 +23,7 @@ export default function ContactPage() {
         eyebrow="CONTACT"
         title="LET'S MAKE"
         titleAccent="SOMETHING WORTH NOTICING."
-        support="Tell us what you're building. We'll reply within one business day with a clear next step."
+        support="Tell us what you're building. We'll get back to you with a clear next step."
       />
 
       <div className="px-6 pb-24 sm:px-8 lg:px-10 lg:pb-32">

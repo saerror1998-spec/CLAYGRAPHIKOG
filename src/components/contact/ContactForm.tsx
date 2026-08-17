@@ -81,8 +81,7 @@ export default function ContactForm() {
           Thanks — we&apos;ll get back to you shortly.
         </h2>
         <p className="mt-3 max-w-md text-sm leading-relaxed text-softgray">
-          We usually reply within one business day. For anything urgent, email
-          connect@claygraphik.com directly.
+          For anything urgent, email connect@claygraphik.com directly.
         </p>
       </div>
     );

@@ -89,31 +89,31 @@
 
 /* ShinyText — narrow bright highlight moving horizontally through static text.
    ShinyText owns ONLY the gradient + background-position (CSS). GSAP never
-   touches this element — GSAP animates the outer wrapper instead. */
+   touches this element — GSAP animates the outer wrapper instead.
+
+   The sweep runs background-position 100% → 0% with background-size 200%:
+   at both extremes the visible window shows pure #CCFF00 (lime), and only
+   the narrow #F4F4EE band crosses the letters in between. The old 200%→-200%
+   range pushed the gradient entirely out of the text box (invisible text). */
 @keyframes shine-sweep {
   0% {
-    background-position: 200% center;
+    background-position: 100% center;
   }
-  10% {
-    background-position: 200% center;
+  5% {
+    background-position: 100% center;
   }
-  50% {
-    background-position: -200% center;
+  45% {
+    background-position: 0% center;
   }
   100% {
-    background-position: -200% center;
+    background-position: 0% center;
   }
 }
 
 .shine-text {
-  background-image: linear-gradient(
-    110deg,
-    #ccff00 40%,
-    #f4f4ee 50%,
-    #ccff00 60%
-  );
-  background-size: 240% auto;
-  background-position: 200% center;
+  background-image: linear-gradient(110deg, #ccff00 47%, #f4f4ee 50%, #ccff00 53%);
+  background-size: 200% auto;
+  background-position: 100% center;
   background-repeat: no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
@@ -122,8 +122,15 @@
 }
 
 .shine-text.shine-active {
-  /* ~2.3s sweep, then a long rest before repeating */
-  animation: shine-sweep 5.5s ease-in-out 0.4s infinite;
+  /* ~2.2s sweep, then a ~3s rest before repeating. First sweep starts
+     ~0.3s after the class lands (0.15s delay + 5% keyframe hold). */
+  animation: shine-sweep 5.5s ease-in-out 0.15s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shine-text.shine-active {
+    animation: none;
+  }
 }
 
 /* GSAP SplitText characters inside the hero mask lines */

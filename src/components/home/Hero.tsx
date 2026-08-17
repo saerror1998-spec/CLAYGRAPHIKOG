@@ -65,14 +65,17 @@ export default function Hero() {
       const cta = root.querySelector("[data-hero-cta]");
       const cue = root.querySelector("[data-hero-cue]");
 
+      // One master timeline — the ENTIRE entrance completes ~1.7s after the
+      // loader reveals the stage. Never paused by scroll: it is time-based
+      // (no ScrollTrigger), so scrolling away mid-entrance cannot stall it.
       const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
 
       // 01 eyebrow
       tl.fromTo(
         eyebrow,
-        { y: 18, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6 },
-        0,
+        { y: 14, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4 },
+        0.05,
       );
 
       // 02 / 03 — white lines, char stagger inside clipping masks
@@ -84,10 +87,10 @@ export default function Hero() {
           {
             yPercent: 0,
             opacity: 1,
-            duration: 0.95,
-            stagger: 0.03,
+            duration: 0.7,
+            stagger: 0.025,
           },
-          0.15 + i * 1.05,
+          i === 0 ? 0.15 : 0.45,
         );
       });
 
@@ -100,35 +103,35 @@ export default function Hero() {
         {
           yPercent: 0,
           opacity: 1,
-          duration: 0.9,
+          duration: 0.75,
           onComplete: () => gsap.set(singleLine, { clearProps: "transform" }),
         },
-        lineGroups.length ? 0.15 + lineGroups.length * 1.05 : 2.4,
+        0.9,
       );
 
       // 05 support copy
       tl.fromTo(
         support,
-        { y: 24, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.65 },
-        3.3,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5 },
+        1.15,
       );
 
       // 06 CTA
       tl.fromTo(
         cta,
-        { y: 24, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.65 },
-        3.65,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5 },
+        1.25,
       );
 
       // 07 scroll cue
-      tl.fromTo(cue, { opacity: 0 }, { opacity: 1, duration: 0.5 }, 3.95);
+      tl.fromTo(cue, { opacity: 0 }, { opacity: 1, duration: 0.4 }, 1.35);
 
-      // 08 shine sweep — starts only after the entrance completes
+      // 08 shine sweep — first sweep ~0.3s after THAT MOVE. settles
       tl.add(() => {
         root.querySelector("[data-shine]")?.classList.add("shine-active");
-      }, 4.05);
+      }, 1.95);
 
       return () => {
         splits.forEach((s) => s.revert());
@@ -166,6 +169,13 @@ export default function Hero() {
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-gradient-to-b from-charcoal/20 via-transparent to-charcoal/55"
+      />
+      {/* Localized top treatment — keeps the logo/eyebrow readable when the
+          aurora's lime band is brightest at the top, without a heavy global
+          overlay: ~65% charcoal fading out by 40% of the hero height. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[40%] bg-gradient-to-b from-charcoal/65 via-charcoal/25 to-transparent"
       />
 
       <div className="relative z-10 flex flex-1 flex-col justify-end pb-24 pt-28 lg:pb-28">
