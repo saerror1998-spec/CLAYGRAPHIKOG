@@ -1,0 +1,79 @@
+/* Clay Graphik StarBorder — edge-travel Lime accent */
+
+.cg-star-border {
+  display: inline-block;
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cg-star-border-bottom {
+  position: absolute;
+  width: 300%;
+  height: 50%;
+  bottom: -12px;
+  right: -250%;
+  border-radius: 50%;
+  animation: cg-star-bottom linear infinite alternate;
+  z-index: 0;
+  transition: opacity 0.4s ease;
+}
+
+.cg-star-border-top {
+  position: absolute;
+  width: 300%;
+  height: 50%;
+  top: -12px;
+  left: -250%;
+  border-radius: 50%;
+  animation: cg-star-top linear infinite alternate;
+  z-index: 0;
+  transition: opacity 0.4s ease;
+}
+
+.cg-star-border-inner {
+  position: relative;
+  border: 1px solid rgba(244, 244, 238, 0.12);
+  background: #050505;
+  color: #F4F4EE;
+  text-align: center;
+  padding: 16px 28px;
+  border-radius: 4px;
+  z-index: 1;
+  transition: border-color 0.3s ease;
+}
+
+.cg-star-border:hover .cg-star-border-inner {
+  border-color: rgba(204, 255, 0, 0.2);
+}
+
+@keyframes cg-star-bottom {
+  0% {
+    transform: translate(0%, 0%);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-100%, 0%);
+    opacity: 0;
+  }
+}
+
+@keyframes cg-star-top {
+  0% {
+    transform: translate(0%, 0%);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(100%, 0%);
+    opacity: 0;
+  }
+}
+
+/* Reduced motion: disable continuous border animation */
+@media (prefers-reduced-motion: reduce) {
+  .cg-star-border-bottom,
+  .cg-star-border-top {
+    animation: none;
+    opacity: 0.3;
+  }
+}

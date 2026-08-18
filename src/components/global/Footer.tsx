@@ -6,6 +6,7 @@ import { gsap, useGSAP } from "@/lib/gsap";
 import { navigation, site, socials, ctas, waLink } from "@/data/siteContent";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 import { useSite } from "./site-context";
+import StarBorder from "@/components/ui/StarBorder";
 
 const services = [
   { label: "Strategy & Identity", href: "/services/strategy-identity" },
@@ -94,16 +95,19 @@ export default function Footer() {
             </div>
 
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-              <Link
+              <StarBorder
+                as={Link}
                 href="/contact"
                 onClick={(e) => { e.preventDefault(); navigate("/contact"); }}
-                className="group inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-wider text-offwhite transition-colors hover:text-lime"
+                className="group inline-flex items-center gap-3"
               >
-                START A PROJECT
-                <span className="inline-block transition-transform group-hover:translate-x-1">
-                  →
+                <span className="text-sm font-semibold uppercase tracking-wider text-offwhite transition-colors hover:text-lime inline-flex items-center gap-3">
+                  START A PROJECT
+                  <span className="inline-block transition-transform group-hover:translate-x-1">
+                    →
+                  </span>
                 </span>
-              </Link>
+              </StarBorder>
               <span className="hidden text-offwhite/20 sm:inline">|</span>
               <a
                 href={waLink()}

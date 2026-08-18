@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import SectionLabel from "./SectionLabel";
+import StarBorder from "@/components/ui/StarBorder";
 import { site, waLink } from "@/data/siteContent";
 
 const ACTIONS = [
@@ -43,17 +44,20 @@ export default function StartProjectSection() {
       <div className="mt-14 flex flex-wrap items-center gap-4 lg:mt-16">
         {ACTIONS.map((action) =>
           action.primary ? (
-            <Link
+            <StarBorder
               key={action.label}
+              as={Link}
               href={action.href}
-              className="group inline-flex items-center gap-3 bg-lime px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-carbon transition-colors duration-300 hover:bg-offwhite"
+              className="group inline-flex items-center gap-3"
             >
-              {action.label}
-              <ArrowUpRight
-                aria-hidden="true"
-                className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-              />
-            </Link>
+              <span className="bg-lime px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-carbon transition-colors duration-300 group-hover:bg-offwhite inline-flex items-center gap-3">
+                {action.label}
+                <ArrowUpRight
+                  aria-hidden="true"
+                  className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                />
+              </span>
+            </StarBorder>
           ) : (
             <Link
               key={action.label}

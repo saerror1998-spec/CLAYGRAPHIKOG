@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import PageHero from "@/components/motion/PageHero";
+import AboutCurvedLoop from "@/components/about/AboutCurvedLoop";
+import StarBorder from "@/components/ui/StarBorder";
 import { services } from "@/data/services";
 import { ctas, principles, seo, site } from "@/data/siteContent";
 
@@ -48,6 +50,10 @@ export default function AboutPage() {
               actually designing and building your project.
             </p>
           </div>
+        </div>
+
+        <div className="mt-24">
+          <AboutCurvedLoop />
         </div>
 
         <div className="mt-24">
@@ -117,16 +123,19 @@ export default function AboutPage() {
               <p className="mt-3 max-w-sm text-sm leading-relaxed text-softgray">
                 Based in {site.location}, serving the {site.serviceArea} markets.
               </p>
-              <Link
+              <StarBorder
+                as={Link}
                 href="/contact"
-                className="group mt-8 inline-flex items-center gap-3 bg-lime px-7 py-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-carbon transition-colors duration-300 hover:bg-offwhite"
+                className="group mt-8 inline-flex items-center gap-3"
               >
-                {ctas.startProject}
-                <ArrowUpRight
-                  aria-hidden="true"
-                  className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                />
-              </Link>
+                <span className="bg-lime px-7 py-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-carbon transition-colors duration-300 group-hover:bg-offwhite inline-flex items-center gap-3">
+                  {ctas.startProject}
+                  <ArrowUpRight
+                    aria-hidden="true"
+                    className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                  />
+                </span>
+              </StarBorder>
             </div>
           </div>
         </div>
