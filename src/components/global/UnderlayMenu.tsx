@@ -181,6 +181,17 @@ export default function UnderlayMenu() {
     firstLink?.focus({ preventScroll: true });
   }, [menuOpen]);
 
+  const { navigate } = useSite();
+
+  /** Prevent default Link navigation and use the column-wipe navigate(). */
+  const handleNav = useCallback(
+    (href: string) => (e: React.MouseEvent) => {
+      e.preventDefault();
+      navigate(href);
+    },
+    [navigate],
+  );
+
   return (
     <div ref={rootRef}>
       {/* ---- Desktop underlay ---- */}
@@ -201,7 +212,7 @@ export default function UnderlayMenu() {
           className={`relative flex h-full w-[400px] flex-col justify-between border-l border-white/[0.06] bg-carbon px-10 py-8 transition-transform duration-300 ease-out ${desktopPanelHidden}`}
         >
           <div className="flex items-center justify-between">
-            <Link href="/" onClick={closeMenu} aria-label="Clay Graphik — Home">
+            <Link href="/" onClick={(e) => { e.preventDefault(); navigate("/"); }} aria-label="Clay Graphik — Home">
               <Image
                 src="/brand/clay-graphik-logo.png"
                 alt="Clay Graphik"
@@ -232,9 +243,9 @@ export default function UnderlayMenu() {
                   >
                     {item.number}
                   </span>
-                  <Link
+                  <a
                     href={item.href}
-                    onClick={closeMenu}
+                    onClick={handleNav(item.href)}
                     className="block overflow-hidden"
                     aria-label={`Go to ${item.label}`}
                   >
@@ -244,7 +255,7 @@ export default function UnderlayMenu() {
                     >
                       {item.label}
                     </span>
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -265,9 +276,9 @@ export default function UnderlayMenu() {
                 </li>
               ))}
             </ul>
-            <Link
+            <a
               href="/contact"
-              onClick={closeMenu}
+              onClick={handleNav("/contact")}
               data-menu-social
               className="group inline-flex items-center gap-2 text-sm font-medium uppercase tracking-[0.08em] text-offwhite transition-colors hover:text-lime"
             >
@@ -275,7 +286,7 @@ export default function UnderlayMenu() {
               <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1">
                 →
               </span>
-            </Link>
+            </a>
             <p className="label mt-8">DUBAI, UAE</p>
           </div>
         </aside>
@@ -315,9 +326,9 @@ export default function UnderlayMenu() {
                 <span data-menu-number className="label w-5 shrink-0 pt-1 text-lime" aria-hidden="true">
                   {item.number}
                 </span>
-                <Link
+                <a
                   href={item.href}
-                  onClick={closeMenu}
+                  onClick={handleNav(item.href)}
                   className="block overflow-hidden"
                   aria-label={`Go to ${item.label}`}
                 >
@@ -327,7 +338,7 @@ export default function UnderlayMenu() {
                   >
                     {item.label}
                   </span>
-                </Link>
+                </a>
               </li>
             ))}
           </ul>
@@ -347,13 +358,13 @@ export default function UnderlayMenu() {
               </a>
             ))}
           </div>
-          <Link
+          <a
             href="/contact"
-            onClick={closeMenu}
+            onClick={handleNav("/contact")}
             className="inline-flex items-center gap-2 text-sm font-medium uppercase tracking-[0.08em] text-offwhite"
           >
             START A PROJECT <span aria-hidden="true">→</span>
-          </Link>
+          </a>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type Lenis from "lenis";
 import { gsap } from "@/lib/gsap";
 import { SiteContext } from "./site-context";
@@ -10,10 +10,11 @@ import Header from "./Header";
 import Footer from "./Footer";
 import UnderlayMenu from "./UnderlayMenu";
 import InitialLoader from "./InitialLoader";
-import RouteTransition from "./RouteTransition";
+import ColumnPageTransition from "./ColumnPageTransition";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 
 const MENU_WIDTH = 400;
+const MENU_CLOSE_DELAY = 150; // ms — column wipe starts this long after menu close begins
 
 /**
  * The Clay Graphik canvas:
@@ -26,11 +27,15 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [entryDone, setEntryDone] = useState(false);
   const [lenis, setLenis] = useState<Lenis | null>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const router = useRouter();
   const reduced = usePrefersReducedMotion();
   const menuOpenRef = useRef(menuOpen);
   menuOpenRef.current = menuOpen;
+  const isNavigatingRef = useRef(isNavigating);
+  isNavigatingRef.current = isNavigating;
 
   const onLenisReady = useCallback((lenis: Lenis) => {
     setLenis(lenis);
@@ -39,6 +44,42 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
   const openMenu = useCallback(() => setMenuOpen(true), []);
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const toggleMenu = useCallback(() => setMenuOpen((v) => !v), []);
+
+  /**
+   * Navigate with the column wipe transition.
+   * If the menu is open it closes first; the route change is delayed so the
+   * column cover begins while the menu is still retracting.
+   */
+  const navigate = useCallback(
+    (href: string) => {
+      if (isNavigatingRef.current) return;
+      const currentPath = window.location.pathname;
+      if (currentPath === href) return;
+
+      setIsNavigating(true);
+
+      if (menuOpenRef.current) {
+        setMenuOpen(false);
+        setTimeout(() => {
+          router.push(href);
+        }, MENU_CLOSE_DELAY);
+      } else {
+        router.push(href);
+      }
+    },
+    [router],
+  );
+
+  // Unlock navigation after the column reveal completes.
+  // The ColumnPageTransition sets isNavigating via context — we listen to a
+  // custom event so the transition component can signal completion without
+  // direct state coupling.
+  useEffect(() => {
+    const onTransitionDone = () => setIsNavigating(false);
+    window.addEventListener("column-transition-done", onTransitionDone);
+    return () =>
+      window.removeEventListener("column-transition-done", onTransitionDone);
+  }, []);
 
   // Lock scrolling during the entry sequence.
   useEffect(() => {
@@ -71,28 +112,12 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
     }
     if (window.innerWidth < 1024) return;
 
-    // Open-state composition: the stage reframes as a designed physical
-    // object — it shrinks slightly and pulls left just enough to expose the
-    // full underlay panel plus a small canvas gap, WITHOUT dragging the whole
-    // stage off-screen. The stage's right (rounded) edge lands at
-    // viewport − panel − gap; its left edge stays far enough right that
-    // centered content (the giant hero headings) is never chopped.
-    // The stage reframes as a designed physical object. The scale + shift
-    // are solved together so the stage's right (rounded) edge lands exactly
-    // at viewport − panel − gap (the underlay is never covered) while the
-    // giant hero heading stays inside the viewport instead of being chopped
-    // off the left edge. scale applies to the FULL stage element width.
     const scale = 0.7;
     const vw = window.innerWidth;
     const gap = 24;
     const shift = MENU_WIDTH + gap - (vw * (1 - scale)) / 2;
 
     if (menuOpen) {
-      // Origin at the stage's TOP-CENTER: the stage reframes in place. A
-      // center origin would scale the full-page-height stage about its
-      // vertical midpoint, dropping its top thousands of pixels below the
-      // viewport (the page appears to jump and the first screen shows the
-      // bare canvas instead of the stage).
       if (reduced) {
         gsap.set(stage, { x: -shift, scale, transformOrigin: "50% 0%" });
       } else {
@@ -119,10 +144,11 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
     }
   }, [menuOpen, reduced]);
 
-  // Close the menu on route change.
+  // Close the menu on route change (the navigate() function already handles
+  // this for menu-triggered navigations; this catches back/forward and
+  // Header/footer clicks).
   useEffect(() => {
-    if (menuOpenRef.current) closeMenu();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (menuOpenRef.current) setMenuOpen(false);
   }, [pathname]);
 
   // Click-away: clicking the stage while the menu is open closes it.
@@ -130,9 +156,9 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (!menuOpenRef.current) return;
       if ((e.target as HTMLElement).closest("[data-menu-toggle]")) return;
-      closeMenu();
+      setMenuOpen(false);
     },
-    [closeMenu],
+    [],
   );
 
   const contextValue = useMemo(
@@ -143,8 +169,10 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
       openMenu,
       closeMenu,
       toggleMenu,
+      isNavigating,
+      navigate,
     }),
-    [lenis, entryDone, menuOpen, openMenu, closeMenu, toggleMenu],
+    [lenis, entryDone, menuOpen, openMenu, closeMenu, toggleMenu, isNavigating, navigate],
   );
 
   return (
@@ -173,7 +201,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <InitialLoader onDone={() => setEntryDone(true)} />
-        <RouteTransition />
+        <ColumnPageTransition />
       </SmoothScrollProvider>
     </SiteContext.Provider>
   );

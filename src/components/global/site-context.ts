@@ -13,6 +13,15 @@ export interface SiteContextValue {
   openMenu: () => void;
   closeMenu: () => void;
   toggleMenu: () => void;
+  /** True while a column-wipe page transition is in progress. */
+  isNavigating: boolean;
+  /**
+   * Navigate to an internal route with the column wipe transition.
+   * If the menu is open, it closes first; the route change is delayed
+   * ~180 ms so the cover animation begins while the menu is still
+   * retracting — matching the reference's coordinated multi-layer feel.
+   */
+  navigate: (href: string) => void;
 }
 
 export const SiteContext = createContext<SiteContextValue | null>(null);

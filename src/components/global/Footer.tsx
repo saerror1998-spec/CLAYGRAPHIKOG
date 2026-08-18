@@ -5,6 +5,7 @@ import Link from "next/link";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { navigation, site, socials, ctas, waLink } from "@/data/siteContent";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
+import { useSite } from "./site-context";
 
 const services = [
   { label: "Strategy & Identity", href: "/services/strategy-identity" },
@@ -18,6 +19,7 @@ export default function Footer() {
   const wordmarkRef = useRef<HTMLDivElement>(null);
   const limeLineRef = useRef<HTMLDivElement>(null);
   const reduced = usePrefersReducedMotion();
+  const { navigate } = useSite();
 
   useGSAP(
     () => {
@@ -94,6 +96,7 @@ export default function Footer() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <Link
                 href="/contact"
+                onClick={(e) => { e.preventDefault(); navigate("/contact"); }}
                 className="group inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-wider text-offwhite transition-colors hover:text-lime"
               >
                 START A PROJECT
@@ -126,6 +129,7 @@ export default function Footer() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
+                      onClick={(e) => { e.preventDefault(); navigate(item.href); }}
                       className="group/link text-[15px] text-softgray transition-colors hover:text-lime"
                     >
                       {item.label}
@@ -143,6 +147,7 @@ export default function Footer() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
+                      onClick={(e) => { e.preventDefault(); navigate(item.href); }}
                       className="text-[15px] text-softgray transition-colors hover:text-lime"
                     >
                       {item.label}
@@ -245,12 +250,14 @@ export default function Footer() {
         <div className="flex gap-6">
           <Link
             href="/privacy"
+            onClick={(e) => { e.preventDefault(); navigate("/privacy"); }}
             className="text-[11px] uppercase tracking-[0.14em] text-offwhite/40 transition-colors hover:text-offwhite"
           >
             Privacy
           </Link>
           <Link
             href="/terms"
+            onClick={(e) => { e.preventDefault(); navigate("/terms"); }}
             className="text-[11px] uppercase tracking-[0.14em] text-offwhite/40 transition-colors hover:text-offwhite"
           >
             Terms
