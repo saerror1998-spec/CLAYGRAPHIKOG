@@ -697,9 +697,9 @@ check(
     (await pp.getByText("Email").count()) > 0,
 );
 check(
-  "footer: tagline + copyright",
-  (await pp.getByText("Strategic Design. Conversion Focused. Growth Driven.").count()) > 0 &&
-    (await pp.getByText("© 2026 Clay Graphik. All rights reserved.").count()) > 0,
+  "footer: wordmark + copyright",
+  (await pp.locator("footer").getByText("CLAY GRAPHIK").count()) > 0 &&
+    (await pp.getByText("© 2026 Clay Graphik").count()) > 0,
 );
 const seoChecks = await pp.evaluate(() => {
   const canonical = document.querySelector('link[rel="canonical"]')?.getAttribute("href") ?? "";
