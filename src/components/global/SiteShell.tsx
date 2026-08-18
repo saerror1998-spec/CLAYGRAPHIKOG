@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import type Lenis from "lenis";
-import { gsap } from "@/lib/gsap";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { SiteContext } from "./site-context";
 import SmoothScrollProvider from "./SmoothScrollProvider";
 import Header from "./Header";
@@ -11,10 +11,10 @@ import Footer from "./Footer";
 import UnderlayMenu from "./UnderlayMenu";
 import InitialLoader from "./InitialLoader";
 import ColumnPageTransition from "./ColumnPageTransition";
+import type { ColumnTransitionHandle } from "./ColumnPageTransition";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 
 const MENU_WIDTH = 400;
-const MENU_CLOSE_DELAY = 150; // ms — column wipe starts this long after menu close begins
 
 /**
  * The Clay Graphik canvas:
@@ -29,6 +29,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
   const [lenis, setLenis] = useState<Lenis | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
+  const transitionRef = useRef<ColumnTransitionHandle>(null);
   const pathname = usePathname();
   const router = useRouter();
   const reduced = usePrefersReducedMotion();
@@ -36,6 +37,8 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
   menuOpenRef.current = menuOpen;
   const isNavigatingRef = useRef(isNavigating);
   isNavigatingRef.current = isNavigating;
+  const pathnameRef = useRef(pathname);
+  pathnameRef.current = pathname;
 
   const onLenisReady = useCallback((lenis: Lenis) => {
     setLenis(lenis);
@@ -46,9 +49,11 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
   const toggleMenu = useCallback(() => setMenuOpen((v) => !v), []);
 
   /**
-   * Navigate with the column wipe transition.
-   * If the menu is open it closes first; the route change is delayed so the
-   * column cover begins while the menu is still retracting.
+   * Navigate with the column wipe transition — IMPERATIVE flow:
+   * 1. Close menu if open (fire-and-forget, overlaps with cover)
+   * 2. Start column cover immediately (same frame)
+   * 3. Wait for full cover → router.push()
+   * 4. Wait for pathname confirmation → scroll reset → reveal
    */
   const navigate = useCallback(
     (href: string) => {
@@ -56,30 +61,42 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
       const currentPath = window.location.pathname;
       if (currentPath === href) return;
 
+      isNavigatingRef.current = true;
       setIsNavigating(true);
 
+      // Close menu if open — fire and forget. The cover animation starts
+      // in the same frame, so both animations overlap visually.
       if (menuOpenRef.current) {
         setMenuOpen(false);
-        setTimeout(() => {
-          router.push(href);
-        }, MENU_CLOSE_DELAY);
-      } else {
-        router.push(href);
       }
-    },
-    [router],
-  );
 
-  // Unlock navigation after the column reveal completes.
-  // The ColumnPageTransition sets isNavigating via context — we listen to a
-  // custom event so the transition component can signal completion without
-  // direct state coupling.
-  useEffect(() => {
-    const onTransitionDone = () => setIsNavigating(false);
-    window.addEventListener("column-transition-done", onTransitionDone);
-    return () =>
-      window.removeEventListener("column-transition-done", onTransitionDone);
-  }, []);
+      // Start the cover animation immediately — no delay.
+      transitionRef.current?.cover().then(async () => {
+        try {
+          // Full cover reached — push route while covered.
+          await router.push(href);
+
+          // Scroll to top while still covered.
+          window.scrollTo(0, 0);
+          lenis?.scrollTo(0, { immediate: true });
+
+          // Wait 2 frames for the destination DOM to paint.
+          await new Promise<void>((r) =>
+            requestAnimationFrame(() => requestAnimationFrame(() => r())),
+          );
+
+          ScrollTrigger.refresh();
+
+          // Reveal the new page.
+          await transitionRef.current?.reveal();
+        } finally {
+          isNavigatingRef.current = false;
+          setIsNavigating(false);
+        }
+      });
+    },
+    [router, lenis],
+  );
 
   // Lock scrolling during the entry sequence.
   useEffect(() => {
@@ -99,9 +116,6 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
   // Foreground stage shift (desktop only). The shift is layout-critical —
   // without it the underlay would stay hidden behind the stage — so it also
   // applies in reduced-motion mode, but INSTANTLY (no tween).
-  // IMPORTANT: never leave a residual transform on the stage when closed —
-  // a transformed ancestor becomes the containing block for fixed elements
-  // and breaks ScrollTrigger's fixed pinning inside the stage.
   const stageMountedRef = useRef(false);
   useEffect(() => {
     const stage = stageRef.current;
@@ -144,9 +158,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
     }
   }, [menuOpen, reduced]);
 
-  // Close the menu on route change (the navigate() function already handles
-  // this for menu-triggered navigations; this catches back/forward and
-  // Header/footer clicks).
+  // Close the menu on route change (catches back/forward navigation).
   useEffect(() => {
     if (menuOpenRef.current) setMenuOpen(false);
   }, [pathname]);
@@ -181,9 +193,6 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
         <UnderlayMenu />
         <div className="relative min-h-screen overflow-x-clip bg-carbon">
           {/* Foreground stage */}
-          {/* NOTE: no will-change/transform on this wrapper — a transformed
-              ancestor would become the containing block for fixed elements
-              and break ScrollTrigger's fixed pinning inside the stage. */}
           <div
             ref={stageRef}
             data-stage
@@ -201,7 +210,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <InitialLoader onDone={() => setEntryDone(true)} />
-        <ColumnPageTransition />
+        <ColumnPageTransition ref={transitionRef} />
       </SmoothScrollProvider>
     </SiteContext.Provider>
   );

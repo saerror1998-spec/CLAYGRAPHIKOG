@@ -17,9 +17,8 @@ export interface SiteContextValue {
   isNavigating: boolean;
   /**
    * Navigate to an internal route with the column wipe transition.
-   * If the menu is open, it closes first; the route change is delayed
-   * ~180 ms so the cover animation begins while the menu is still
-   * retracting — matching the reference's coordinated multi-layer feel.
+   * If the menu is open, it closes immediately (overlapping with the cover).
+   * The cover starts in the same frame as the click — no pre-delay.
    */
   navigate: (href: string) => void;
 }

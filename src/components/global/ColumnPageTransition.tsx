@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { forwardRef, useImperativeHandle, useRef } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { useSite } from "./site-context";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
@@ -9,114 +8,110 @@ import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 const COL_COUNT = 6;
 const COL_COLORS = ["#121212", "#101010", "#0E0E0E", "#121212", "#101010", "#0E0E0E"];
 
+export interface ColumnTransitionHandle {
+  /** Instantly start the column-wipe cover animation. Resolves at full cover. */
+  cover: () => Promise<void>;
+  /** Reveal the destination page. Resolves when overlay is hidden. */
+  reveal: () => Promise<void>;
+}
+
 /**
  * Column-wipe page transition — 6 vertical strips enter from the top with
- * right-to-left stagger (stair-step cover), route switches at full coverage,
- * then strips retract left-to-right to reveal the destination page.
+ * right-to-left stagger (stair-step cover), then retract left-to-right
+ * to reveal the destination page.
  *
- * Coordinates with the underlay menu: when the menu is open the cover
- * animation starts ~150 ms after `closeMenu()` so both layers animate
- * simultaneously — the menu sliding right while columns wipe down from above.
+ * Exposed imperatively via ref: SiteShell calls cover() → push route → reveal().
  */
-export default function ColumnPageTransition() {
-  const pathname = usePathname();
-  const prevPathnameRef = useRef(pathname);
-  const mountedRef = useRef(false);
+const ColumnPageTransition = forwardRef<ColumnTransitionHandle>(function ColumnPageTransition(
+  _props,
+  ref,
+) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const { lenis } = useSite();
   const reduced = usePrefersReducedMotion();
   const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const lenisRef = useRef(lenis);
+  lenisRef.current = lenis;
 
-  // Skip the very first pathname (initial render) — no transition on load.
-  useEffect(() => {
-    mountedRef.current = true;
-  }, []);
+  const resetScroll = () => {
+    window.scrollTo(0, 0);
+    lenisRef.current?.scrollTo(0, { immediate: true });
+    ScrollTrigger.refresh();
+  };
 
-  // Reduced-motion: ensure overlay is invisible.
-  useEffect(() => {
-    if (!reduced || !overlayRef.current) return;
-    gsap.set(overlayRef.current, { visibility: "hidden" });
-  }, [reduced]);
+  useImperativeHandle(ref, () => ({
+    cover: () =>
+      new Promise<void>((resolve) => {
+        const overlay = overlayRef.current;
+        if (!overlay || reduced) {
+          resolve();
+          return;
+        }
 
-  useEffect(() => {
-    if (!mountedRef.current) return;
-    if (prevPathnameRef.current === pathname) return;
-    prevPathnameRef.current = pathname;
+        // Kill any in-flight timeline.
+        tlRef.current?.kill();
 
-    const overlay = overlayRef.current;
-    if (!overlay || reduced) {
-      window.scrollTo(0, 0);
-      lenis?.scrollTo(0, { immediate: true });
-      ScrollTrigger.refresh();
-      return;
-    }
+        const columns = Array.from(
+          overlay.querySelectorAll<HTMLElement>("[data-col]"),
+        );
 
-    // Kill any in-flight transition.
-    tlRef.current?.kill();
+        // Prepare: all columns hidden at top.
+        gsap.set(overlay, { visibility: "visible" });
+        gsap.set(columns, {
+          scaleY: 0,
+          transformOrigin: "top",
+          willChange: "transform",
+        });
 
-    const columns = Array.from(
-      overlay.querySelectorAll<HTMLElement>("[data-col]"),
-    );
+        // Cover — right-to-left stagger (from: "end" = last column first).
+        const tl = gsap.timeline({ onComplete: resolve });
+        tlRef.current = tl;
 
-    const resetScroll = () => {
-      window.scrollTo(0, 0);
-      lenis?.scrollTo(0, { immediate: true });
-      ScrollTrigger.refresh();
-    };
+        tl.to(columns, {
+          scaleY: 1,
+          duration: 0.46,
+          ease: "power3.inOut",
+          stagger: { each: 0.05, from: "end" },
+        });
+      }),
 
-    // Phase 1 — COVER: columns scale from top, staggered right → left.
-    // Phase 2 — hold briefly, reset scroll.
-    // Phase 3 — REVEAL: columns scale to bottom, staggered left → right.
-    const tl = gsap.timeline({
-      onComplete: () => {
-        tlRef.current = null;
-        window.dispatchEvent(new CustomEvent("column-transition-done"));
-      },
-    });
+    reveal: () =>
+      new Promise<void>((resolve) => {
+        const overlay = overlayRef.current;
+        if (!overlay || reduced) {
+          resolve();
+          return;
+        }
 
-    tlRef.current = tl;
+        const columns = Array.from(
+          overlay.querySelectorAll<HTMLElement>("[data-col]"),
+        );
 
-    // Prepare: all columns hidden at top.
-    tl.set(overlay, { visibility: "visible" });
-    tl.set(columns, {
-      scaleY: 0,
-      transformOrigin: "top",
-      willChange: "transform",
-    });
+        // Switch transform-origin to bottom for the retract.
+        gsap.set(columns, { transformOrigin: "bottom" });
 
-    // Cover — right-to-left stagger (from: "end" = last column first).
-    tl.to(columns, {
-      scaleY: 1,
-      duration: 0.52,
-      ease: "power3.inOut",
-      stagger: { each: 0.065, from: "end" },
-    });
+        const tl = gsap.timeline({
+          onComplete: () => {
+            tlRef.current = null;
+            window.dispatchEvent(new CustomEvent("column-transition-done"));
+            resolve();
+          },
+        });
+        tlRef.current = tl;
 
-    // Scroll reset at ~70% of cover.
-    tl.add(() => resetScroll(), "-=0.18");
+        // Reveal — left-to-right stagger (from: "start" = first column first).
+        tl.to(columns, {
+          scaleY: 0,
+          duration: 0.46,
+          ease: "power3.inOut",
+          stagger: { each: 0.05, from: "start" },
+        });
 
-    // Brief hold (~50 ms) then reveal.
-    // Switch transform-origin to bottom for the retract.
-    tl.set(columns, { transformOrigin: "bottom" });
-
-    // Reveal — left-to-right stagger (from: "start" = first column first).
-    tl.to(columns, {
-      scaleY: 0,
-      duration: 0.52,
-      ease: "power3.inOut",
-      stagger: { each: 0.065, from: "start" },
-    });
-
-    // Clean up.
-    tl.set(overlay, { visibility: "hidden" });
-    tl.set(columns, { clearProps: "willChange" });
-
-    return () => {
-      tl.kill();
-      tlRef.current = null;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+        // Clean up after reveal.
+        tl.set(overlay, { visibility: "hidden" });
+        tl.set(columns, { clearProps: "willChange" });
+      }),
+  }), [reduced]);
 
   const overlayClass = reduced
     ? "invisible translate-y-full"
@@ -143,4 +138,6 @@ export default function ColumnPageTransition() {
       ))}
     </div>
   );
-}
+});
+
+export default ColumnPageTransition;
