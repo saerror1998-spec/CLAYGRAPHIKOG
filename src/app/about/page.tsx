@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import PageHero from "@/components/motion/PageHero";
 import AboutCurvedLoop from "@/components/about/AboutCurvedLoop";
 import StarBorder from "@/components/ui/StarBorder";
+import LiquidButton from "@/components/ui/LiquidButton";
 import { services } from "@/data/services";
 import { ctas, principles, seo, site } from "@/data/siteContent";
 
@@ -124,17 +125,21 @@ export default function AboutPage() {
                 Based in {site.location}, serving the {site.serviceArea} markets.
               </p>
               <StarBorder
-                as={Link}
-                href="/contact"
-                className="group mt-8 inline-flex items-center gap-3"
+                as="div"
+                className="mt-8 inline-block"
+                style={{ padding: 0 }}
               >
-                <span className="bg-lime px-7 py-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-carbon transition-colors duration-300 group-hover:bg-offwhite inline-flex items-center gap-3">
+                <LiquidButton
+                  as={Link}
+                  href="/contact"
+                  className="inline-flex items-center gap-3 px-7 py-4 text-[11px] font-semibold uppercase tracking-[0.18em]"
+                >
                   {ctas.startProject}
                   <ArrowUpRight
                     aria-hidden="true"
-                    className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                    className="h-4 w-4"
                   />
-                </span>
+                </LiquidButton>
               </StarBorder>
             </div>
           </div>

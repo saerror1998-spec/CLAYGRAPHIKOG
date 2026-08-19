@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import SectionLabel from "./SectionLabel";
 import StarBorder from "@/components/ui/StarBorder";
+import LiquidButton from "@/components/ui/LiquidButton";
 import { site, waLink } from "@/data/siteContent";
 
 const ACTIONS = [
@@ -46,17 +47,21 @@ export default function StartProjectSection() {
           action.primary ? (
             <StarBorder
               key={action.label}
-              as={Link}
-              href={action.href}
-              className="group inline-flex items-center gap-3"
+              as="div"
+              className="inline-block"
+              style={{ padding: 0 }}
             >
-              <span className="bg-lime px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-carbon transition-colors duration-300 group-hover:bg-offwhite inline-flex items-center gap-3">
+              <LiquidButton
+                as={Link}
+                href={action.href}
+                className="inline-flex items-center gap-3 px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.18em]"
+              >
                 {action.label}
                 <ArrowUpRight
                   aria-hidden="true"
-                  className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                  className="h-4 w-4"
                 />
-              </span>
+              </LiquidButton>
             </StarBorder>
           ) : (
             <Link

@@ -11,6 +11,7 @@ import Footer from "./Footer";
 import UnderlayMenu from "./UnderlayMenu";
 import InitialLoader from "./InitialLoader";
 import ColumnPageTransition from "./ColumnPageTransition";
+import SmoothCursor from "@/components/ui/SmoothCursor";
 import type { ColumnTransitionHandle } from "./ColumnPageTransition";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 
@@ -211,6 +212,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
 
         <InitialLoader onDone={() => setEntryDone(true)} />
         <ColumnPageTransition ref={transitionRef} />
+        <SmoothCursor />
       </SmoothScrollProvider>
     </SiteContext.Provider>
   );

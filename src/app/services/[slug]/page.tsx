@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import PageHero from "@/components/motion/PageHero";
 import StarBorder from "@/components/ui/StarBorder";
+import LiquidButton from "@/components/ui/LiquidButton";
 import { getService, services } from "@/data/services";
 import { getProject } from "@/data/projects";
 
@@ -75,17 +76,21 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
             </p>
 
             <StarBorder
-              as={Link}
-              href={`/contact?service=${encodeURIComponent(service.title)}`}
-              className="group mt-10 inline-flex items-center gap-3"
+              as="div"
+              className="mt-10 inline-block"
+              style={{ padding: 0 }}
             >
-              <span className="bg-lime px-7 py-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-carbon transition-colors duration-300 group-hover:bg-offwhite inline-flex items-center gap-3">
+              <LiquidButton
+                as={Link}
+                href={`/contact?service=${encodeURIComponent(service.title)}`}
+                className="inline-flex items-center gap-3 px-7 py-4 text-[11px] font-semibold uppercase tracking-[0.18em]"
+              >
                 START A PROJECT
                 <ArrowUpRight
                   aria-hidden="true"
-                  className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                  className="h-4 w-4"
                 />
-              </span>
+              </LiquidButton>
             </StarBorder>
 
             <Link

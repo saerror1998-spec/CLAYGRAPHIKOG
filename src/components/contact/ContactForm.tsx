@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import StarBorder from "@/components/ui/StarBorder";
+import LiquidButton from "@/components/ui/LiquidButton";
 import { services } from "@/data/services";
 import { site, waLink } from "@/data/siteContent";
 
@@ -257,18 +258,22 @@ export default function ContactForm({ defaultService, reference }: ContactFormPr
 
       <div className="mt-10 flex flex-col items-start gap-4">
         <StarBorder
-          as="button"
-          type="submit"
-          disabled={state.status === "submitting"}
-          className="group cursor-pointer"
+          as="div"
+          className="inline-block"
+          style={{ padding: 0 }}
         >
-          <span className="bg-lime px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-carbon transition-colors duration-300 group-hover:bg-offwhite disabled:cursor-not-allowed disabled:opacity-60 inline-flex items-center gap-3">
+          <LiquidButton
+            as="button"
+            type="submit"
+            disabled={state.status === "submitting"}
+            className="inline-flex items-center gap-3 px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.18em] disabled:cursor-not-allowed disabled:opacity-60"
+          >
             {state.status === "submitting" ? "PREPARING WHATSAPP…" : "SEND VIA WHATSAPP"}
             <ArrowUpRight
               aria-hidden="true"
-              className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              className="h-4 w-4"
             />
-          </span>
+          </LiquidButton>
         </StarBorder>
         <p className="max-w-md text-xs leading-relaxed text-softgray/60">
           Your details stay in your browser — submitting opens WhatsApp with your message

@@ -1,0 +1,95 @@
+/* Clay Graphik LiquidButton — Lime fill rises from bottom on hover */
+
+.cg-liquid-btn {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transform: scale(1);
+  transition: transform 0.28s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: transform;
+}
+
+/* ── Fill layer ───────────────────────────────────────────────── */
+
+.cg-liquid-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #ccff00;
+  transform-origin: bottom;
+  transition: height 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+  z-index: 0;
+}
+
+.cg-liquid-hover .cg-liquid-fill {
+  height: 100%;
+}
+
+/* ── Content layer ────────────────────────────────────────────── */
+
+.cg-liquid-content {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: #f4f4ee;
+  transition: color 0.35s ease 0.08s;
+}
+
+.cg-liquid-hover .cg-liquid-content {
+  color: #050505;
+}
+
+/* Arrow child */
+.cg-liquid-content > svg,
+.cg-liquid-content > span > svg {
+  transition: transform 0.28s cubic-bezier(0.23, 1, 0.32, 1),
+    color 0.35s ease 0.08s;
+}
+
+.cg-liquid-hover .cg-liquid-content > svg,
+.cg-liquid-hover .cg-liquid-content > span > svg {
+  color: #050505;
+  transform: translate(3px, -2px);
+}
+
+/* ── Hover scale ──────────────────────────────────────────────── */
+
+.cg-liquid-hover {
+  transform: scale(1.02);
+}
+
+/* ── Tap / active ─────────────────────────────────────────────── */
+
+.cg-liquid-press {
+  transform: scale(0.97) !important;
+  transition-duration: 0.08s;
+}
+
+/* ── Focus-visible ────────────────────────────────────────────── */
+
+.cg-liquid-btn:focus-visible {
+  outline: 2px solid #ccff00;
+  outline-offset: 3px;
+}
+
+/* ── Reduced motion ───────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .cg-liquid-btn {
+    transition: none;
+    transform: none !important;
+  }
+  .cg-liquid-fill {
+    transition: none;
+  }
+  .cg-liquid-content {
+    transition: none;
+  }
+  .cg-liquid-hover .cg-liquid-fill {
+    height: 3px;
+  }
+}

@@ -173,6 +173,20 @@
   pointer-events: none;
 }
 
+/* ── SMOOTH CUSTOM CURSOR ───────────────────────────── */
+.cg-custom-cursor,
+.cg-custom-cursor * {
+  cursor: none !important;
+}
+
+/* Keep native cursor for text-entry fields */
+.cg-custom-cursor input,
+.cg-custom-cursor textarea,
+.cg-custom-cursor select,
+.cg-custom-cursor [contenteditable] {
+  cursor: text !important;
+}
+
 /* Hero scroll cue — thin lime line dropping repeatedly (CSS only) */
 @keyframes cue-drop {
   0% {
