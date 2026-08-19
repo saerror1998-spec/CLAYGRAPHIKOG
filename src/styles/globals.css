@@ -211,6 +211,31 @@
   animation: cue-drop 2.4s ease-in-out infinite;
 }
 
+/* ── IMAGE TRAIL ──────────────────────────────────── */
+.trail-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+  will-change: transform, opacity;
+  z-index: 10;
+}
+
+/* ── CIRCULAR GALLERY ─────────────────────────────── */
+.circular-gallery:focus-visible {
+  outline: 2px solid #ccff00;
+  outline-offset: 4px;
+}
+
+/* Ensure gallery canvas is visible with brightness boost */
+.circular-gallery canvas {
+  position: relative;
+  z-index: 10;
+  filter: brightness(1.15);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

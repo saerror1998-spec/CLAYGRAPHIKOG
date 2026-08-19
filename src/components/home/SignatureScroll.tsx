@@ -179,7 +179,7 @@ export default function SignatureScroll() {
         animation: tl,
         trigger: root,
         start: "top top",
-        end: "+=300%",
+        end: "+=200%",
         pin: true,
         scrub: 1,
         anticipatePin: 1,
@@ -197,11 +197,16 @@ export default function SignatureScroll() {
         aria-label="From idea to impact"
       >
         <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#050505]/50">
-          03 / FROM IDEA TO IMPACT
+          01 / FROM IDEA TO IMPACT
         </p>
         <ol className="mt-10">
           {STEPS.map((s, i) => (
-            <li key={s.word} className="border-t border-[#050505]/15 py-10">
+            <li
+              key={s.word}
+              className={`border-t border-[#050505]/15 ${
+                i === STEPS.length - 1 ? "py-16 pb-24" : "py-12 min-h-[30vh]"
+              } flex flex-col justify-center`}
+            >
               <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#050505]/50">
                 0{i + 1}
               </p>
@@ -223,13 +228,13 @@ export default function SignatureScroll() {
   return (
     <section
       ref={rootRef}
-      className="h-[100svh] overflow-hidden bg-[#F4F4EE] text-[#050505]"
+      className="bg-[#F4F4EE] text-[#050505] lg:h-[100svh] lg:overflow-hidden"
       aria-label="From idea to impact"
     >
       {/* Desktop pinned scene */}
       <div className="hidden h-full flex-col items-center justify-center px-6 text-center lg:flex">
         <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#050505]/50">
-          03 / FROM IDEA TO IMPACT
+          01 / FROM IDEA TO IMPACT
         </p>
 
         {/* Dominant phase word — font-size lives on the container so the
@@ -306,11 +311,11 @@ export default function SignatureScroll() {
       {/* Mobile vertical sequence */}
       <div className="px-6 py-20 lg:hidden">
         <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#050505]/50">
-          03 / FROM IDEA TO IMPACT
+          01 / FROM IDEA TO IMPACT
         </p>
         <ol className="mt-6">
           {STEPS.map((s, i) => (
-            <li key={s.word} data-mobile-block className="border-t border-[#050505]/15 py-12">
+            <li key={s.word} data-mobile-block className={`border-t border-[#050505]/15 ${i === STEPS.length - 1 ? 'py-16 pb-24 min-h-[50vh]' : 'py-12 min-h-[30vh]'}`}>
               <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#050505]/50">
                 0{i + 1}
               </p>

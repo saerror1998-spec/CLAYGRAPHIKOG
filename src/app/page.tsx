@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Hero from "@/components/home/Hero";
-import WhatWeDo from "@/components/home/WhatWeDo";
-import SelectedWork from "@/components/home/SelectedWork";
 import SignatureScroll from "@/components/home/SignatureScroll";
-import ServicesSection from "@/components/home/ServicesSection";
-import ProcessSection from "@/components/home/ProcessSection";
-import StudioSection from "@/components/home/StudioSection";
-import StartProjectSection from "@/components/home/StartProjectSection";
+import HomeServices from "@/components/home/HomeServices";
+import HomeProjects from "@/components/home/HomeProjects";
+import HomeBrandLoop from "@/components/home/HomeBrandLoop";
+import HomeSolutions from "@/components/home/HomeSolutions";
+import HomeReviews from "@/components/home/HomeReviews";
+import HomeProjectCTA from "@/components/home/HomeProjectCTA";
+import HomeVisualGallery from "@/components/home/HomeVisualGallery";
 import { seo } from "@/data/siteContent";
 
 export const metadata: Metadata = {
@@ -15,17 +16,31 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
+/**
+ * Editorial homepage:
+ * 00 — Hero [KEEP]
+ * 01 — FROM IDEA TO IMPACT [SignatureScroll — restored]
+ * 02 — Services / What We Do
+ * 03 — Projects & Branding (scroll-stack)
+ * 04 — Brand / Capability Loop
+ * 05 — Solutions
+ * 06 — Client Reviews
+ * 07 — Project CTA / Image Banner
+ * 08 — Visual Gallery (CircularGallery + ImageTrail)
+ * 09 — Premium Footer [KEEP]
+ */
 export default function HomePage() {
   return (
     <>
       <Hero />
-      <WhatWeDo />
-      <SelectedWork />
       <SignatureScroll />
-      <ServicesSection />
-      <ProcessSection />
-      <StudioSection />
-      <StartProjectSection />
+      <HomeServices />
+      <HomeProjects />
+      <HomeBrandLoop />
+      <HomeSolutions />
+      <HomeReviews />
+      <HomeProjectCTA />
+      <HomeVisualGallery />
     </>
   );
 }
