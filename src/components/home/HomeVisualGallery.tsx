@@ -25,7 +25,7 @@ const TRAIL_IMAGES = [
 ];
 
 /**
- * 08 / VISUAL GALLERY — CircularGallery + ImageTrail + masked typography.
+ * 10 / STUDIO EXPERIENCE — CircularGallery + ImageTrail + masked typography.
  */
 export default function HomeVisualGallery() {
   const rootRef = useRef<HTMLElement>(null);
@@ -106,7 +106,7 @@ export default function HomeVisualGallery() {
       className="relative overflow-hidden bg-carbon"
     >
       <p className="px-6 pt-6 font-mono text-[11px] uppercase tracking-[0.18em] text-offwhite/40 lg:px-10">
-        <span className="text-lime/60">08</span> / STUDIO EXPERIENCE
+        <span className="text-lime/60">10</span> / STUDIO EXPERIENCE
       </p>
 
       {/* CircularGallery — no clip-path, directly visible */}

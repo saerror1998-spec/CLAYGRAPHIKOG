@@ -8,9 +8,10 @@ import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 import { waLink } from "@/data/siteContent";
 import StarBorder from "@/components/ui/StarBorder";
 import LiquidButton from "@/components/ui/LiquidButton";
+import BackgroundBeamsWithCollision from "@/components/ui/BackgroundBeamsWithCollision";
 
 /**
- * 07 / PROJECT CTA — image banner with clip-path expansion reveal
+ * 08 / PROJECT CTA — image banner with clip-path expansion reveal
  * and masked typography.
  */
 export default function HomeProjectCTA() {
@@ -87,6 +88,7 @@ export default function HomeProjectCTA() {
       ref={rootRef}
       className="relative overflow-hidden bg-carbon px-6 py-32 sm:px-8 lg:px-10 lg:py-44"
     >
+      <BackgroundBeamsWithCollision />
       {/* Background image with clip-path expansion */}
       <div
         ref={bgRef}
@@ -101,7 +103,7 @@ export default function HomeProjectCTA() {
 
       <div className="relative z-10 mx-auto max-w-4xl text-center">
         <p className="mb-6 font-mono text-[11px] uppercase tracking-[0.18em] text-offwhite/40">
-          <span className="text-lime/60">07</span> / START A PROJECT
+          <span className="text-lime/60">08</span> / START A PROJECT
         </p>
         <p
           data-cta-eyebrow

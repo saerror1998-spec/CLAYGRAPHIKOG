@@ -14,18 +14,11 @@ const SERVICE_IMAGES: Record<string, string> = {
   "creative-direction": "/images/home/home-service-creative.jpg",
 };
 
-const SERVICE_WORDS = ["STRATEGY", "IDENTITY", "WEB", "CONTENT", "CREATIVE"];
-
 /**
- * 02 / SERVICES — sticky category stage with visible handoffs.
+ * 03 / WHAT WE DO — continuous editorial row flow.
  *
- * Structure:
- *  - Section header (masked heading)
- *  - Category stage (position:sticky) — user scrolls through 5 word handoffs
- *  - Service detail rows
- *
- * The category stage pins for ~120vh, during which each word becomes
- * the active dominant word one at a time.
+ * No sticky category stage. Each service row flows naturally
+ * through the viewport as a unified 3-column composition.
  */
 export default function HomeServices() {
   const rootRef = useRef<HTMLElement>(null);
@@ -52,77 +45,28 @@ export default function HomeServices() {
       const entranceTl = gsap.timeline({
         scrollTrigger: {
           trigger: root,
-          start: "top 85%",
-          end: "top 50%",
+          start: "top 82%",
+          end: "top 45%",
           scrub: 0.8,
         },
       });
 
       if (label) {
         gsap.set(label, { opacity: 0, y: 16 });
-        entranceTl.to(label, { opacity: 1, y: 0, duration: 0.3, ease: "none" }, 0);
+        entranceTl.to(label, { opacity: 1, y: 0, duration: 0.25, ease: "none" }, 0);
       }
 
       headlineLines.forEach((line, i) => {
         gsap.set(line, { yPercent: 105 });
-        entranceTl.to(line, { yPercent: 0, duration: 0.5, ease: "none" }, 0.05 + i * 0.12);
+        entranceTl.to(line, { yPercent: 0, duration: 0.45, ease: "none" }, 0.03 + i * 0.1);
       });
 
       if (supportText) {
         gsap.set(supportText, { opacity: 0, y: 16 });
-        entranceTl.to(supportText, { opacity: 1, y: 0, duration: 0.3, ease: "none" }, 0.4);
+        entranceTl.to(supportText, { opacity: 1, y: 0, duration: 0.3, ease: "none" }, 0.35);
       }
 
-      // --- Category stage: sticky with controlled scroll progression ---
-      const catStage = root.querySelector<HTMLElement>("[data-svc-cat-stage]");
-      const categoryWords = Array.from(
-        root.querySelectorAll<HTMLElement>("[data-svc-word]"),
-      );
-
-      if (catStage && categoryWords.length) {
-        // Pin the category stage for a controlled scroll journey
-        ScrollTrigger.create({
-          trigger: catStage,
-          start: "top 15%",
-          end: () => `+=${window.innerHeight * 1.2}`,
-          pin: true,
-          scrub: 0.3,
-          onUpdate: (self) => {
-            const progress = self.progress;
-            // Map 0-1 to 0-4 index, with each word getting ~20% of the journey
-            const activeIdx = Math.min(
-              Math.floor(progress * categoryWords.length),
-              categoryWords.length - 1,
-            );
-
-            categoryWords.forEach((w, i) => {
-              if (i === activeIdx) {
-                gsap.to(w, {
-                  opacity: 1,
-                  color: "#050505",
-                  y: 0,
-                  duration: 0.3,
-                  ease: "power2.out",
-                  overwrite: "auto",
-                });
-                w.classList.add("text-lime");
-              } else {
-                gsap.to(w, {
-                  opacity: 0.2,
-                  color: "#b9b9b3",
-                  y: i < activeIdx ? -8 : 8,
-                  duration: 0.3,
-                  ease: "power2.out",
-                  overwrite: "auto",
-                });
-                w.classList.remove("text-lime");
-              }
-            });
-          },
-        });
-      }
-
-      // --- Service detail rows ---
+      // --- Service rows: continuous viewport-driven flow ---
       const rows = Array.from(root.querySelectorAll<HTMLElement>("[data-svc-row]"));
       rows.forEach((row) => {
         const divider = row.querySelector<HTMLElement>("[data-svc-row-divider]");
@@ -133,50 +77,58 @@ export default function HomeServices() {
         const link = row.querySelector("[data-svc-row-link]");
         const imageWrap = row.querySelector<HTMLElement>("[data-svc-row-image]");
 
+        // One unified timeline per row — enters from below, settles, exits above
         const rowTl = gsap.timeline({
           scrollTrigger: {
             trigger: row,
-            start: "top 82%",
-            end: "top 40%",
+            start: "top 90%",
+            end: "bottom 10%",
             scrub: 0.6,
           },
         });
 
+        // Divider draws
         if (divider) {
           gsap.set(divider, { scaleX: 0, transformOrigin: "left" });
-          rowTl.to(divider, { scaleX: 1, duration: 0.25, ease: "none" }, 0);
+          rowTl.to(divider, { scaleX: 1, duration: 0.15, ease: "none" }, 0);
         }
+
+        // Left: number + title
         if (rowLabel) {
           gsap.set(rowLabel, { opacity: 0, y: 12 });
-          rowTl.to(rowLabel, { opacity: 1, y: 0, duration: 0.2, ease: "none" }, 0.05);
+          rowTl.to(rowLabel, { opacity: 1, y: 0, duration: 0.2, ease: "none" }, 0.02);
         }
         if (title) {
           gsap.set(title, { yPercent: 105 });
-          rowTl.to(title, { yPercent: 0, duration: 0.35, ease: "none" }, 0.08);
+          rowTl.to(title, { yPercent: 0, duration: 0.3, ease: "none" }, 0.04);
         }
+
+        // Center: description + tags
         if (desc) {
-          gsap.set(desc, { opacity: 0, y: 12 });
-          rowTl.to(desc, { opacity: 1, y: 0, duration: 0.25, ease: "none" }, 0.15);
+          gsap.set(desc, { opacity: 0, y: 20 });
+          rowTl.to(desc, { opacity: 1, y: 0, duration: 0.25, ease: "power3.out" }, 0.08);
         }
         if (tags) {
-          gsap.set(tags, { opacity: 0, y: 8 });
-          rowTl.to(tags, { opacity: 1, y: 0, duration: 0.2, ease: "none" }, 0.2);
+          gsap.set(tags, { opacity: 0, y: 10 });
+          rowTl.to(tags, { opacity: 1, y: 0, duration: 0.2, ease: "none" }, 0.12);
         }
         if (link) {
           gsap.set(link, { opacity: 0 });
-          rowTl.to(link, { opacity: 1, duration: 0.15, ease: "none" }, 0.25);
+          rowTl.to(link, { opacity: 1, duration: 0.15, ease: "none" }, 0.15);
         }
+
+        // Right: image — subtle scale, no clip-path drama
         if (imageWrap) {
-          gsap.set(imageWrap, {
-            clipPath: "inset(100% 0 0 0)",
-            scale: 1.06,
-          });
+          gsap.set(imageWrap, { opacity: 0.4, y: 20, scale: 1.02 });
           rowTl.to(
             imageWrap,
-            { clipPath: "inset(0% 0 0 0)", scale: 1, duration: 0.4, ease: "none" },
-            0.1,
+            { opacity: 1, y: 0, scale: 1, duration: 0.35, ease: "none" },
+            0.06,
           );
         }
+
+        // Exit: subtle opacity reduction as row scrolls away
+        rowTl.to(row, { opacity: 0.7, duration: 0.3, ease: "none" }, 0.7);
       });
     },
     { scope: rootRef, dependencies: [reduced] },
@@ -192,7 +144,8 @@ export default function HomeServices() {
         data-svc-label
         className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#050505]/50"
       >
-        02 / WHAT WE DO
+        <span className="text-lime">03</span>{" "}
+        <span>/ WHAT WE DO</span>
       </p>
 
       {/* Headline — each line wrapped for mask reveal */}
@@ -222,29 +175,14 @@ export default function HomeServices() {
         into connected systems built for clarity, credibility and growth.
       </p>
 
-      {/* Category stage — sticky with scroll-driven word progression */}
-      <div
-        data-svc-cat-stage
-        className="mt-16 flex flex-wrap items-center justify-start gap-x-8 gap-y-3 lg:gap-x-12"
-      >
-        {SERVICE_WORDS.map((word) => (
-          <span
-            key={word}
-            data-svc-word
-            className="text-[clamp(2rem,5vw,4.5rem)] font-semibold uppercase tracking-[-0.03em] text-[#050505]/15 will-change-transform"
-          >
-            {word}
-          </span>
-        ))}
-      </div>
-
-      {/* Service detail rows */}
-      <div className="mt-24">
+      {/* Service rows — continuous 3-column flow */}
+      <div className="mt-20">
         {services.map((service) => (
           <article key={service.slug} data-svc-row className="group">
             <div data-svc-row-divider className="h-px bg-[#050505]/10" />
 
             <div className="grid grid-cols-1 gap-8 py-12 lg:grid-cols-12 lg:items-start lg:gap-12 lg:py-16">
+              {/* Left: number + title */}
               <div className="lg:col-span-4">
                 <p data-svc-row-label className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#CCFF00]">
                   {service.number}
@@ -256,6 +194,7 @@ export default function HomeServices() {
                 </div>
               </div>
 
+              {/* Center: description + tags */}
               <div className="lg:col-span-5">
                 <p data-svc-row-desc className="text-base leading-relaxed text-[#050505]/60">
                   {service.description}
@@ -269,6 +208,7 @@ export default function HomeServices() {
                 </ul>
               </div>
 
+              {/* Right: image + CTA */}
               <div className="lg:col-span-3">
                 <div data-svc-row-image className="aspect-[4/3] overflow-hidden rounded-xl bg-[#050505]/5">
                   {/* eslint-disable-next-line @next/next/no-img-element */}

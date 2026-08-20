@@ -5,7 +5,7 @@ import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 
 /**
- * 06 / WHAT CLIENTS VALUE — horizontal scroll stage with GSAP pin.
+ * 07 / WHAT CLIENTS VALUE — horizontal scroll stage with GSAP pin.
  * Desktop: GSAP pin + scrub drives horizontal card track movement.
  * Travel calculated from last card bounding rect, NOT track.scrollWidth.
  * Track animates ONLY X. Cards animate ONLY opacity.
@@ -173,7 +173,7 @@ export default function HomeReviews() {
         data-rev-label
         className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#050505]/50"
       >
-        06 / WHAT CLIENTS VALUE
+        07 / WHAT CLIENTS VALUE
       </p>
 
       <div className="overflow-hidden">

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Hero from "@/components/home/Hero";
 import SignatureScroll from "@/components/home/SignatureScroll";
+import HomeOutcomes from "@/components/home/HomeOutcomes";
 import HomeServices from "@/components/home/HomeServices";
 import HomeProjects from "@/components/home/HomeProjects";
 import HomeBrandLoop from "@/components/home/HomeBrandLoop";
@@ -8,6 +9,7 @@ import HomeSolutions from "@/components/home/HomeSolutions";
 import HomeReviews from "@/components/home/HomeReviews";
 import HomeProjectCTA from "@/components/home/HomeProjectCTA";
 import HomeVisualGallery from "@/components/home/HomeVisualGallery";
+import HomeTestimonials from "@/components/home/HomeTestimonials";
 import { seo } from "@/data/siteContent";
 
 export const metadata: Metadata = {
@@ -19,27 +21,30 @@ export const metadata: Metadata = {
 /**
  * Editorial homepage:
  * 00 — Hero [KEEP]
- * 01 — FROM IDEA TO IMPACT [SignatureScroll — restored]
- * 02 — Services / What We Do
- * 03 — Projects & Branding (scroll-stack)
- * 04 — Brand / Capability Loop
- * 05 — Solutions
- * 06 — Client Reviews
- * 07 — Project CTA / Image Banner
- * 08 — Visual Gallery (CircularGallery + ImageTrail)
- * 09 — Premium Footer [KEEP]
+ * 01 — FROM IDEA TO IMPACT [SignatureScroll]
+ * 02 — BUILT FOR OUTCOMES [HomeOutcomes]
+ * 03 — WHAT WE DO [Services]
+ * 04 — SELECTED WORK [Projects]
+ * 05 — CAPABILITIES [BrandLoop]
+ * 06 — SOLUTIONS [Solutions]
+ * 07 — WHAT CLIENTS VALUE [Reviews]
+ * 08 — START A PROJECT [CTA]
+ * 09 — CLIENT REVIEWS [Flying Posters Testimonials]
+ * 10 — STUDIO EXPERIENCE [CircularGallery + ImageTrail]
  */
 export default function HomePage() {
   return (
     <>
       <Hero />
       <SignatureScroll />
+      <HomeOutcomes />
       <HomeServices />
       <HomeProjects />
       <HomeBrandLoop />
       <HomeSolutions />
       <HomeReviews />
       <HomeProjectCTA />
+      <HomeTestimonials />
       <HomeVisualGallery />
     </>
   );

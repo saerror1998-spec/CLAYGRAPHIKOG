@@ -3,6 +3,7 @@
 import { useEffect, useRef, memo, useCallback, useState } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
+import BackgroundBeamsWithCollision from "@/components/ui/BackgroundBeamsWithCollision";
 
 const CAPABILITIES = [
   "BRAND STRATEGY",
@@ -130,10 +131,12 @@ export default memo(function HomeBrandLoop() {
   return (
     <section
       ref={containerRef}
-      className="overflow-hidden border-y border-white/[0.06] bg-charcoal px-6 py-16 sm:px-8 lg:px-10 lg:py-20"
+      className="relative overflow-hidden border-y border-white/[0.06] bg-charcoal px-6 py-16 sm:px-8 lg:px-10 lg:py-20"
     >
+      <BackgroundBeamsWithCollision />
+      <div className="relative z-10">
       <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-offwhite/40">
-        <span className="text-lime/60">04</span> / CAPABILITIES
+        <span className="text-lime/60">05</span> / CAPABILITIES
       </p>
       <p className="mb-6 font-mono text-[11px] uppercase tracking-[0.18em] text-offwhite/40">
         OUR CAPABILITIES
@@ -168,6 +171,7 @@ export default memo(function HomeBrandLoop() {
             </ul>
           ))}
         </div>
+      </div>
       </div>
     </section>
   );

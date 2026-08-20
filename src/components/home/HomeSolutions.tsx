@@ -45,7 +45,7 @@ const SOLUTIONS = [
 ];
 
 /**
- * 05 / SOLUTIONS — reference-style motion:
+ * 06 / SOLUTIONS — reference-style motion:
  * - Masked SOLUTIONS heading + outlined FOR GROWTH with offset
  * - Progressive row reveal with divider draws
  * - Image clip reveals with scale
@@ -201,7 +201,7 @@ export default function HomeSolutions() {
         data-sol-label
         className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#050505]/50"
       >
-        05 / SOLUTIONS
+        06 / SOLUTIONS
       </p>
 
       {/* Heading */}
