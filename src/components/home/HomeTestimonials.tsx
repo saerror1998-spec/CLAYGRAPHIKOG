@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP } from "@/lib/gsap";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 
 /**
@@ -36,11 +36,13 @@ function MarqueeRow({
   speed,
   direction = "left",
   rowIndex,
+  parentRef,
 }: {
   images: string[];
   speed: number;
   direction?: "left" | "right";
   rowIndex: number;
+  parentRef: React.RefObject<HTMLElement | null>;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
 
@@ -71,10 +73,28 @@ function MarqueeRow({
       },
     });
 
+    // Pause marquee when entire section is offscreen
+    const section = parentRef.current;
+    let io: IntersectionObserver | null = null;
+    if (section) {
+      io = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            tween.play();
+          } else {
+            tween.pause();
+          }
+        },
+        { threshold: 0 },
+      );
+      io.observe(section);
+    }
+
     return () => {
       tween.kill();
+      io?.disconnect();
     };
-  }, [images.length, speed, direction]);
+  }, [images.length, speed, direction, parentRef]);
 
   // Double the items for seamless loop
   const doubled = [...images, ...images];
@@ -209,12 +229,14 @@ export default function HomeTestimonials() {
           speed={34}
           direction="left"
           rowIndex={0}
+          parentRef={sectionRef}
         />
         <MarqueeRow
           images={row2Images}
           speed={40}
           direction="left"
           rowIndex={1}
+          parentRef={sectionRef}
         />
       </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { gsap } from "@/lib/gsap";
 
 /* ─── Beam config ─────────────────────────────────────────── */
@@ -49,13 +49,13 @@ export default function BackgroundBeamsWithCollision({
 }: BackgroundBeamsWithCollisionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const boundaryRef = useRef<HTMLDivElement>(null);
-  const rafIdRef = useRef(0);
   const destroyedRef = useRef(false);
-  const visibleRef = useRef(false);
 
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const beamConfigs = overrideBeams ?? (isMobile ? MOBILE_BEAMS : DESKTOP_BEAMS);
   const particleCount = overrideParticleCount ?? (isMobile ? PARTICLE_COUNT_MOBILE : PARTICLE_COUNT_DESKTOP);
+  // Keep timeline refs stable across renders
+  const timelinesRef = useRef<gsap.core.Timeline[]>([]);
 
   /* Track which beam elements have already collided this cycle */
   const collidedSet = useRef(new Set<number>());
@@ -72,10 +72,18 @@ export default function BackgroundBeamsWithCollision({
     if (!containerRef.current || !boundaryRef.current) return;
     destroyedRef.current = false;
 
-    /* ─── IntersectionObserver ──────────────── */
+    /* ─── IntersectionObserver — pause/resume beams ────── */
+    let paused = false;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        visibleRef.current = entry.isIntersecting;
+        const visible = entry.isIntersecting;
+        if (visible && paused) {
+          timelines.forEach((tl) => tl.play());
+          paused = false;
+        } else if (!visible && !paused) {
+          timelines.forEach((tl) => tl.pause());
+          paused = true;
+        }
       },
       { threshold: 0.05 },
     );
@@ -125,11 +133,13 @@ export default function BackgroundBeamsWithCollision({
 
     /* ─── Start all timelines ──────────────── */
     timelines.forEach((tl) => tl.play());
+    timelinesRef.current = timelines;
 
     return () => {
       destroyedRef.current = true;
       observer.disconnect();
       timelines.forEach((tl) => tl.kill());
+      timelinesRef.current = [];
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [beamConfigs.length, particleCount]);

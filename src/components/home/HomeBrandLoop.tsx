@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, memo, useCallback, useState } from "react";
-import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP } from "@/lib/gsap";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 import BackgroundBeamsWithCollision from "@/components/ui/BackgroundBeamsWithCollision";
 
