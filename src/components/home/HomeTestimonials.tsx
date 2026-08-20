@@ -1,14 +1,15 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
+import Marquee from "@/components/ui/Marquee";
 
 /**
- * 09 / CLIENT REVIEWS — two-row horizontal marquee.
+ * 09 / CLIENT REVIEWS — two-row CSS marquee.
  * Dark background. Flat 4:3 testimonial artwork cards.
- * Continuous seamless GSAP-driven horizontal motion.
- * No FlyingPosters. No pin. No 3D rotation.
+ * Pure CSS animation via @keyframes marquee-x.
+ * No GSAP marquee. No FlyingPosters. No 3D rotation.
  */
 
 const testimonialImages = [
@@ -20,7 +21,7 @@ const testimonialImages = [
   "/images/testimonials/testimonial-06.jpg",
 ];
 
-// Row 2 uses a different order for the staggered reference look
+// Row 2 uses a different order for staggered visual rhythm
 const row1Images = [...testimonialImages];
 const row2Images = [
   testimonialImages[3],
@@ -31,97 +32,18 @@ const row2Images = [
   testimonialImages[2],
 ];
 
-function MarqueeRow({
-  images,
-  speed,
-  direction = "left",
-  rowIndex,
-  parentRef,
-}: {
-  images: string[];
-  speed: number;
-  direction?: "left" | "right";
-  rowIndex: number;
-  parentRef: React.RefObject<HTMLElement | null>;
-}) {
-  const trackRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-
-    // Duplicate items for seamless loop
-    const items = track.querySelectorAll<HTMLElement>("[data-marquee-item]");
-    if (items.length === 0) return;
-
-    // Measure one set width
-    const firstSet = Array.from(items).slice(0, images.length);
-    const gap = 16; // gap-4
-    const totalSetWidth = firstSet.reduce((acc, el) => acc + el.offsetWidth + gap, 0);
-
-    const dir = direction === "left" ? -1 : 1;
-    const tween = gsap.to(track, {
-      x: dir * -totalSetWidth,
-      duration: speed,
-      ease: "none",
-      repeat: -1,
-      modifiers: {
-        x: gsap.utils.unitize((x) => {
-          const val = parseFloat(x);
-          return val % totalSetWidth;
-        }),
-      },
-    });
-
-    // Pause marquee when entire section is offscreen
-    const section = parentRef.current;
-    let io: IntersectionObserver | null = null;
-    if (section) {
-      io = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            tween.play();
-          } else {
-            tween.pause();
-          }
-        },
-        { threshold: 0 },
-      );
-      io.observe(section);
-    }
-
-    return () => {
-      tween.kill();
-      io?.disconnect();
-    };
-  }, [images.length, speed, direction, parentRef]);
-
-  // Double the items for seamless loop
-  const doubled = [...images, ...images];
-
+function TestimonialCard({ src, index }: { src: string; index: number }) {
   return (
-    <div className="overflow-hidden py-2" data-marquee-viewport={rowIndex}>
-      <div
-        ref={trackRef}
-        className="flex gap-4"
-        style={{ width: "max-content" }}
-      >
-        {doubled.map((src, i) => (
-          <div
-            key={`${rowIndex}-${i}`}
-            data-marquee-item
-            className="shrink-0 overflow-hidden rounded-[6px] border border-white/[0.10]"
-            style={{ width: "clamp(260px, 26vw, 360px)", aspectRatio: "4/3" }}
-          >
-            <img
-              src={src}
-              alt="Client testimonial"
-              className="h-full w-full object-cover"
-              draggable={false}
-            />
-          </div>
-        ))}
-      </div>
+    <div
+      className="shrink-0 overflow-hidden rounded-[6px] border border-white/[0.10]"
+      style={{ width: "clamp(260px, 26vw, 360px)", aspectRatio: "4/3" }}
+    >
+      <img
+        src={src}
+        alt={`Client testimonial ${index + 1}`}
+        className="h-full w-full object-cover"
+        draggable={false}
+      />
     </div>
   );
 }
@@ -132,7 +54,26 @@ export default function HomeTestimonials() {
   const line2Ref = useRef<HTMLDivElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const [isPaused, setIsPaused] = useState(false);
 
+  // IntersectionObserver: pause marquee when section is offscreen
+  const handleIntersection = useCallback(([entry]: IntersectionObserverEntry[]) => {
+    setIsPaused(!entry.isIntersecting);
+  }, []);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const io = new IntersectionObserver(handleIntersection, {
+      threshold: 0,
+      rootMargin: "200px 0px",
+    });
+    io.observe(section);
+    return () => io.disconnect();
+  }, [handleIntersection]);
+
+  // Heading entrance animation (GSAP only for the heading — marquee is pure CSS)
   useGSAP(
     () => {
       if (prefersReducedMotion) return;
@@ -223,21 +164,32 @@ export default function HomeTestimonials() {
       </p>
 
       {/* Marquee rows */}
-      <div className="space-y-4">
-        <MarqueeRow
-          images={row1Images}
-          speed={34}
-          direction="left"
-          rowIndex={0}
-          parentRef={sectionRef}
-        />
-        <MarqueeRow
-          images={row2Images}
-          speed={40}
-          direction="left"
-          rowIndex={1}
-          parentRef={sectionRef}
-        />
+      <div
+        className={`flex flex-col gap-3 md:gap-4 ${isPaused ? "marquee-paused" : ""}`}
+      >
+        {/* Row 1 — normal direction, 12s */}
+        <Marquee
+          repeat={3}
+          pauseOnHover
+          applyMask
+          style={{ ["--duration" as string]: "12s" }}
+        >
+          {row1Images.map((src, i) => (
+            <TestimonialCard key={`r1-${i}`} src={src} index={i} />
+          ))}
+        </Marquee>
+
+        {/* Row 2 — same direction, phase-shifted via animation-delay, 12s */}
+        <Marquee
+          repeat={3}
+          pauseOnHover
+          applyMask
+          style={{ ["--duration" as string]: "12s" }}
+        >
+          {row2Images.map((src, i) => (
+            <TestimonialCard key={`r2-${i}`} src={src} index={i} />
+          ))}
+        </Marquee>
       </div>
 
       {/* Bottom subtle divider */}

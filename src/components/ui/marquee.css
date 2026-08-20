@@ -1,0 +1,30 @@
+@layer components {
+  @keyframes marquee-x {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+
+  .marquee-horizontal {
+    animation: marquee-x var(--duration) infinite linear;
+  }
+
+  .group\/marquee:hover .marquee-pause-on-hover {
+    animation-play-state: paused;
+  }
+
+  /* Pause when section is offscreen */
+  .marquee-paused .marquee-horizontal {
+    animation-play-state: paused;
+  }
+
+  /* Reduced motion: pause all marquee animations */
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-horizontal {
+      animation-play-state: paused !important;
+    }
+  }
+}
