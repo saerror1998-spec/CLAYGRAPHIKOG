@@ -8,7 +8,6 @@ import HomeBrandLoop from "@/components/home/HomeBrandLoop";
 import HomeSolutions from "@/components/home/HomeSolutions";
 import HomeReviews from "@/components/home/HomeReviews";
 import HomeProjectCTA from "@/components/home/HomeProjectCTA";
-import HomeVisualGallery from "@/components/home/HomeVisualGallery";
 import HomeTestimonials from "@/components/home/HomeTestimonials";
 import { seo } from "@/data/siteContent";
 
@@ -29,8 +28,7 @@ export const metadata: Metadata = {
  * 06 — SOLUTIONS [Solutions]
  * 07 — WHAT CLIENTS VALUE [Reviews]
  * 08 — START A PROJECT [CTA]
- * 09 — CLIENT REVIEWS [Flying Posters Testimonials]
- * 10 — STUDIO EXPERIENCE [CircularGallery + ImageTrail]
+ * 09 — CLIENT REVIEWS [Marquee Testimonials]
  */
 export default function HomePage() {
   return (
@@ -45,7 +43,6 @@ export default function HomePage() {
       <HomeReviews />
       <HomeProjectCTA />
       <HomeTestimonials />
-      <HomeVisualGallery />
     </>
   );
 }
