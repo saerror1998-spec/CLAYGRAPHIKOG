@@ -211,6 +211,28 @@
   animation: cue-drop 2.4s ease-in-out infinite;
 }
 
+/* ── Team tilted card ─────────────────────────────────── */
+.team-tilt-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: default;
+}
+
+.team-tilt-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 20px;
+  will-change: transform;
+  transform: translateZ(0);
+  user-select: none;
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
