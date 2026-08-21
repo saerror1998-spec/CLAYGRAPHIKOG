@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import PageHero from "@/components/motion/PageHero";
 import AboutCurvedLoop from "@/components/about/AboutCurvedLoop";
+import AboutTeam from "@/components/about/AboutTeam";
 import StarBorder from "@/components/ui/StarBorder";
 import LiquidButton from "@/components/ui/LiquidButton";
 import { services } from "@/data/services";
@@ -103,6 +104,10 @@ export default function AboutPage() {
               </Link>
             ))}
           </div>
+        </div>
+
+        <div className="mt-24">
+          <AboutTeam />
         </div>
 
         <div className="mt-24 grid grid-cols-1 gap-14 lg:grid-cols-12">
