@@ -69,19 +69,19 @@ void main() {
     wave += mouseInfluence * sin(i * 0.5 + uTime);
     float dist = abs(y - (threadY + wave));
 
-    float thickness = 0.002 + hash(i + 300.0) * 0.0015;
+    float thickness = 0.004 + hash(i + 300.0) * 0.003;
     float brightness = smoothstep(thickness, 0.0, dist);
-    float depth = 0.35 + hash(i + 400.0) * 0.65;
+    float depth = 0.5 + hash(i + 400.0) * 0.5;
     brightness *= depth;
 
     threads += brightness;
   }
 
   threads = clamp(threads, 0.0, 1.0);
-  vec3 color = uColor * threads;
-  float alpha = threads * 0.75;
+  float alpha = clamp(threads * 1.4, 0.0, 1.0);
+  vec3 premulColor = uColor * alpha;
 
-  gl_FragColor = vec4(color, alpha);
+  gl_FragColor = vec4(premulColor, alpha);
 }
 `;
 
@@ -169,9 +169,9 @@ export default function HeroThreadsBackground({
       return;
     }
 
-    /* Enable blending for transparent output. */
+    /* Enable blending for transparent output (premultiplied alpha). */
     gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     gl.clearColor(0, 0, 0, 0);
 
     /* Compile shaders. */
