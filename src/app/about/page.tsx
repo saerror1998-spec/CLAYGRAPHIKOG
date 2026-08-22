@@ -7,12 +7,23 @@ import AboutTeam from "@/components/about/AboutTeam";
 import StarBorder from "@/components/ui/StarBorder";
 import LiquidButton from "@/components/ui/LiquidButton";
 import { services } from "@/data/services";
-import { ctas, principles, seo, site } from "@/data/siteContent";
+import { ctas, ogDefaults, principles, seo, site, twitterDefaults } from "@/data/siteContent";
 
 export const metadata: Metadata = {
   title: seo.about.title,
   description: seo.about.description,
   alternates: { canonical: "/about" },
+  openGraph: {
+    ...ogDefaults,
+    title: seo.about.title,
+    description: seo.about.description,
+    url: "/about",
+  },
+  twitter: {
+    ...twitterDefaults,
+    title: seo.about.title,
+    description: seo.about.description,
+  },
 };
 
 export default function AboutPage() {

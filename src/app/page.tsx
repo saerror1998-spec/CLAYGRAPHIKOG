@@ -9,12 +9,23 @@ import HomeSolutions from "@/components/home/HomeSolutions";
 import HomeReviews from "@/components/home/HomeReviews";
 import HomeProjectCTA from "@/components/home/HomeProjectCTA";
 import HomeTestimonials from "@/components/home/HomeTestimonials";
-import { seo } from "@/data/siteContent";
+import { seo, ogDefaults, twitterDefaults } from "@/data/siteContent";
 
 export const metadata: Metadata = {
   title: seo.home.title,
   description: seo.home.description,
   alternates: { canonical: "/" },
+  openGraph: {
+    ...ogDefaults,
+    title: seo.home.title,
+    description: seo.home.description,
+    url: "/",
+  },
+  twitter: {
+    ...twitterDefaults,
+    title: seo.home.title,
+    description: seo.home.description,
+  },
 };
 
 /**

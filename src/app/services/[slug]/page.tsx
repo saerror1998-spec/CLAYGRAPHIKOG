@@ -6,6 +6,7 @@ import PageHero from "@/components/motion/PageHero";
 import StarBorder from "@/components/ui/StarBorder";
 import LiquidButton from "@/components/ui/LiquidButton";
 import { getService, services } from "@/data/services";
+import { ogDefaults, serviceSeo, twitterDefaults } from "@/data/siteContent";
 import { getProject } from "@/data/projects";
 
 interface ServiceDetailPageProps {
@@ -22,10 +23,24 @@ export async function generateMetadata({
   const { slug } = await params;
   const service = getService(slug);
   if (!service) return { title: "Services" };
+  const seoEntry = serviceSeo[slug];
+  const title = seoEntry?.title ?? `${service.title} | Clay Graphik`;
+  const description = seoEntry?.description ?? service.description;
   return {
-    title: service.title,
-    description: service.description,
+    title,
+    description,
     alternates: { canonical: `/services/${service.slug}` },
+    openGraph: {
+      ...ogDefaults,
+      title,
+      description,
+      url: `/services/${service.slug}`,
+    },
+    twitter: {
+      ...twitterDefaults,
+      title,
+      description,
+    },
   };
 }
 

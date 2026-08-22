@@ -1,7 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import SiteShell from "@/components/global/SiteShell";
-import { organizationSchema, seo, site } from "@/data/siteContent";
+import { organizationSchema, ogDefaults, professionalServiceSchema, seo, site, twitterDefaults } from "@/data/siteContent";
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: site.name,
+  url: site.website,
+};
 import "../styles/globals.css";
 
 const hanken = Hanken_Grotesk({
@@ -44,19 +51,15 @@ export const metadata: Metadata = {
     "GCC",
   ],
   openGraph: {
-    type: "website",
-    locale: "en_US",
+    ...ogDefaults,
     url: SITE_URL,
-    siteName: SITE_NAME,
     title: seo.home.title,
     description: seo.home.description,
-    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: SITE_NAME }],
   },
   twitter: {
-    card: "summary_large_image",
+    ...twitterDefaults,
     title: seo.home.title,
     description: seo.home.description,
-    images: [OG_IMAGE],
   },
   robots: {
     index: true,
@@ -79,6 +82,14 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(professionalServiceSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
         />
         <SiteShell>{children}</SiteShell>
       </body>

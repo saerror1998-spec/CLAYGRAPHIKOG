@@ -2,12 +2,24 @@ import type { Metadata } from "next";
 import PageHero from "@/components/motion/PageHero";
 import ContactForm from "@/components/contact/ContactForm";
 import FAQ from "@/components/global/FAQ";
-import { seo, site } from "@/data/siteContent";
+import FaqSchema from "@/components/global/FaqSchema";
+import { ogDefaults, seo, site, twitterDefaults } from "@/data/siteContent";
 
 export const metadata: Metadata = {
   title: seo.contact.title,
   description: seo.contact.description,
   alternates: { canonical: "/contact" },
+  openGraph: {
+    ...ogDefaults,
+    title: seo.contact.title,
+    description: seo.contact.description,
+    url: "/contact",
+  },
+  twitter: {
+    ...twitterDefaults,
+    title: seo.contact.title,
+    description: seo.contact.description,
+  },
 };
 
 const DIRECT = [
@@ -36,6 +48,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
         : undefined;
   return (
     <>
+      <FaqSchema />
       <PageHero
         eyebrow="CONTACT"
         title="LET'S MAKE"

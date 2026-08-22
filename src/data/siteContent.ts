@@ -167,34 +167,86 @@ export const faqs = [
 export const seo = {
   home: {
     title:
-      "Clay Graphik — Creative Studio in Dubai | Branding, Web & Digital Design",
+      "Clay Graphik — Branding & Web Design Studio, Dubai",
     description:
-      "Clay Graphik is an independent creative studio in Dubai creating strategic brand identities, high-performing websites and digital content systems for businesses across the UAE, GCC and beyond.",
+      "Independent branding and web design studio in Dubai. Strategic brand identities, high-performing websites and content systems for UAE and GCC businesses.",
   },
   services: {
-    title: "Creative Services — Branding, Web Design & Content | Clay Graphik Dubai",
+    title: "Branding, Web Design & Content Services",
     description:
-      "Explore Clay Graphik services across brand strategy and identity, website design and development, content systems and creative direction.",
+      "Brand strategy, website design, content systems and creative direction — services built to work together for UAE and GCC businesses.",
   },
   work: {
-    title: "Selected Work — Clay Graphik Creative Studio Dubai",
+    title: "Our Work — Branding & Web Design Projects",
     description:
-      "Explore selected branding, website and digital creative projects by Clay Graphik.",
+      "See branding, website and content system case studies from Clay Graphik — real projects for UAE and GCC clients across industries.",
   },
   about: {
-    title: "About Clay Graphik — Independent Creative Studio in Dubai",
+    title: "About Clay Graphik — Independent Studio in Dubai",
     description:
-      "Clay Graphik is an independent Dubai creative studio helping businesses build clearer brands, stronger digital experiences and consistent creative systems.",
+      "Independent Dubai creative studio helping UAE and GCC businesses build clearer brands, stronger websites and consistent creative systems.",
   },
   contact: {
-    title: "Start a Project — Contact Clay Graphik Dubai",
+    title: "Contact Clay Graphik — Start a Project, Dubai",
     description:
-      "Contact Clay Graphik for branding, website design, content systems and creative direction projects in the UAE, GCC and beyond.",
+      "Tell us about your branding, website or content project. Clay Graphik responds with a clear next step — based in Dubai, serving the UAE and GCC.",
+  },
+  strategyIdentity: {
+    title: "Brand Strategy & Identity Design — Dubai",
+    description:
+      "Brand strategy, positioning and visual identity design for Dubai and GCC businesses — logo, color systems, typography and brand guidelines.",
+  },
+  websitesUx: {
+    title: "Website Design & UX Agency — Dubai",
+    description:
+      "Conversion-focused website design and UX for Dubai and UAE businesses — responsive, credible, built to guide visitors to action.",
+  },
+  contentSystems: {
+    title: "Social Media & Content Systems — Dubai",
+    description:
+      "Repeatable Instagram and social content systems for Dubai brands — templates, carousels and campaign creative that stay on-brand.",
+  },
+  creativeDirection: {
+    title: "Creative Direction & Brand Applications",
+    description:
+      "Creative direction for presentations, packaging, digital products and launch campaigns — practical brand applications for UAE businesses.",
   },
 } as const;
 
-/** Organization / ProfessionalService structured data (verified fields only). */
+/** Map service slug → SEO entry for generateMetadata. */
+export const serviceSeo: Record<string, { title: string; description: string }> = {
+  "strategy-identity": seo.strategyIdentity,
+  "websites-ux": seo.websitesUx,
+  "content-systems": seo.contentSystems,
+  "creative-direction": seo.creativeDirection,
+};
+
+/** Shared Open Graph defaults — every page must include these. */
+export const ogDefaults = {
+  type: "website" as const,
+  locale: "en_US" as const,
+  siteName: site.name,
+  images: [{ url: `${site.website}/og.png`, width: 1200, height: 630, alt: site.name }],
+};
+
+/** Shared Twitter card defaults — simpler format for twitter meta. */
+export const twitterDefaults = {
+  card: "summary_large_image" as const,
+  images: [`${site.website}/og.png`] as [string],
+};
+
+/** Global Organization schema — verified fields only. */
 export const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Clay Graphik",
+  url: site.website,
+  logo: `${site.website}/brand/clay-graphik-logo.png`,
+  sameAs: [site.instagramUrl, site.threadsUrl],
+} as const;
+
+/** ProfessionalService schema — verified business fields only. */
+export const professionalServiceSchema = {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
   name: "Clay Graphik",

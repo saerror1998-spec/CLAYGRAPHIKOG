@@ -3,13 +3,25 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import PageHero from "@/components/motion/PageHero";
 import FAQ from "@/components/global/FAQ";
+import FaqSchema from "@/components/global/FaqSchema";
 import { services } from "@/data/services";
-import { ctas, seo } from "@/data/siteContent";
+import { ctas, ogDefaults, seo, twitterDefaults } from "@/data/siteContent";
 
 export const metadata: Metadata = {
   title: seo.services.title,
   description: seo.services.description,
   alternates: { canonical: "/services" },
+  openGraph: {
+    ...ogDefaults,
+    title: seo.services.title,
+    description: seo.services.description,
+    url: "/services",
+  },
+  twitter: {
+    ...twitterDefaults,
+    title: seo.services.title,
+    description: seo.services.description,
+  },
 };
 
 const ISSUES = [
@@ -34,6 +46,7 @@ const ISSUES = [
 export default function ServicesPage() {
   return (
     <>
+      <FaqSchema />
       <PageHero
         eyebrow="SERVICES"
         title="DESIGN SYSTEMS"
