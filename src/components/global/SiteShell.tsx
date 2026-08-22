@@ -203,7 +203,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
             <div className="p-3 sm:p-4 lg:p-6">
               <div className="relative flex min-h-[calc(100svh-24px)] flex-col overflow-hidden rounded-[28px] bg-charcoal shadow-[0_0_90px_rgba(0,0,0,0.6)] ring-1 ring-white/[0.04] lg:min-h-[calc(100svh-48px)] lg:rounded-[32px]">
                 <Header />
-                <main className="flex-1">{children}</main>
+                <main id="main-content" className="flex-1">{children}</main>
                 <Footer />
               </div>
             </div>
