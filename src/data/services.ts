@@ -40,7 +40,7 @@ export const services: Service[] = [
       "Brand Guidelines",
       "Brand Applications",
     ],
-    relatedWork: ["brand-book-system"],
+    relatedWork: ["jdc-global", "soundscape", "lacabite"],
     about:
       "Brand strategy and identity design for businesses that need a clear, professional and consistent visual presence. Clay Graphik works with founders, service businesses and growing brands across Dubai, the UAE and the GCC who want their brand to feel credible from the first impression through every customer touchpoint.",
     problem:
@@ -77,7 +77,7 @@ export const services: Service[] = [
       "Basic On-Page SEO",
       "Performance Optimization",
     ],
-    relatedWork: ["web-platform-concept"],
+    relatedWork: ["nelta-tech", "lacabite", "web-platform-concept"],
     about:
       "Website design and UX for businesses that need a digital presence which looks credible, communicates clearly and converts visitors into enquiries. Clay Graphik builds responsive websites for companies in Dubai, the UAE and the GCC — from single-page landing experiences to full service-site builds.",
     problem:
@@ -113,7 +113,7 @@ export const services: Service[] = [
       "Launch Content",
       "Digital Advertising Creative",
     ],
-    relatedWork: ["content-system-concept"],
+    relatedWork: ["nelta-tech", "content-system-concept"],
     about:
       "Social media and content systems for brands that need to stay visible and consistent across digital channels. Clay Graphik creates reusable template libraries, campaign frameworks and brand-aligned creative for businesses in Dubai, the UAE and the GCC who want content that looks intentional — not improvised.",
     problem:
@@ -150,7 +150,7 @@ export const services: Service[] = [
       "Campaign Systems",
       "Digital Product UI",
     ],
-    relatedWork: ["brand-book-system"],
+    relatedWork: ["soundscape", "jdc-global", "brand-book-system"],
     about:
       "Creative direction and brand applications for businesses that need their visual system extended into practical, real-world assets. Clay Graphik works with companies across Dubai, the UAE and the GCC on presentations, packaging, digital products, launch campaigns and branded materials that stay consistent with the wider identity.",
     problem:

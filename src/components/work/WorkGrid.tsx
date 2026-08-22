@@ -3,7 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { projects, type ProjectCategory } from "@/data/projects";
+import {
+  projects,
+  type ProjectCategory,
+  type Project,
+} from "@/data/projects";
 import MediaReveal from "@/components/motion/MediaReveal";
 import { gsap } from "@/lib/gsap";
 
@@ -14,6 +18,46 @@ const FILTERS: Array<{ label: string; value: ProjectCategory | "ALL" }> = [
   { label: "SOCIAL / DIGITAL", value: "Social / Digital" },
 ];
 
+function ProjectCard({
+  project,
+  index,
+}: {
+  project: Project;
+  index: number;
+}) {
+  return (
+    <article className={`group ${index % 2 === 1 ? "md:mt-20" : ""}`}>
+      <Link href={`/work/${project.slug}`} className="block">
+        <MediaReveal className="aspect-[4/5] rounded-xl">
+          <Image
+            src={project.image}
+            alt={project.imageAlt}
+            width={1200}
+            height={1500}
+            className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
+          />
+        </MediaReveal>
+        <div className="mt-6 flex items-start justify-between gap-6">
+          <div>
+            <h2 className="text-2xl font-medium tracking-tight text-offwhite transition-colors duration-300 group-hover:text-lime sm:text-3xl">
+              {project.title}
+            </h2>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <p className="label">{project.category}</p>
+              {project.status === "concept" ? (
+                <span className="label border border-white/12 px-2 py-0.5 text-offwhite/50">
+                  STUDIO CONCEPT
+                </span>
+              ) : null}
+            </div>
+          </div>
+          <p className="label mt-1">{project.year}</p>
+        </div>
+      </Link>
+    </article>
+  );
+}
+
 /**
  * Work index: category filter with a fast, smooth crossfade (no dashboard
  * filtering UI). Transition is a short GSAP fade — not a per-frame loop.
@@ -23,8 +67,11 @@ export default function WorkGrid() {
   const gridRef = useRef<HTMLDivElement>(null);
   const transitioningRef = useRef(false);
 
-  const visible =
+  const allFiltered =
     filter === "ALL" ? projects : projects.filter((p) => p.category === filter);
+
+  const filteredClients = allFiltered.filter((p) => p.status === "client");
+  const filteredConcepts = allFiltered.filter((p) => p.status === "concept");
 
   useEffect(() => {
     if (transitioningRef.current) return;
@@ -40,7 +87,6 @@ export default function WorkGrid() {
       duration: 0.18,
       ease: "power2.in",
       onComplete: () => {
-        // Re-render with the new filter happens via state above; animate back in.
         gsap.fromTo(
           grid,
           { opacity: 0, y: 10 },
@@ -72,38 +118,34 @@ export default function WorkGrid() {
         ))}
       </div>
 
-      <div ref={gridRef} className="grid grid-cols-1 gap-16 md:grid-cols-2 md:gap-10 lg:gap-14">
-        {visible.map((project, i) => (
-          <article key={project.slug} className={`group ${i % 2 === 1 ? "md:mt-20" : ""}`}>
-            <Link href={`/work/${project.slug}`} className="block">
-              <MediaReveal className="aspect-[4/5] rounded-xl">
-                <Image
-                  src={project.image}
-                  alt={project.imageAlt}
-                  width={1200}
-                  height={1500}
-                  className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
+      <div ref={gridRef}>
+        {/* ── CLIENT WORK ── */}
+        {filteredClients.length > 0 && (
+          <>
+            <p className="label mb-8 text-lime">CLIENT WORK</p>
+            <div className="grid grid-cols-1 gap-16 md:grid-cols-2 md:gap-10 lg:gap-14">
+              {filteredClients.map((project, i) => (
+                <ProjectCard key={project.slug} project={project} index={i} />
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* ── STUDIO CONCEPT ── */}
+        {filteredConcepts.length > 0 && (
+          <div className={filteredClients.length > 0 ? "mt-20" : ""}>
+            <p className="label mb-8 text-offwhite/50">STUDIO CONCEPT</p>
+            <div className="grid grid-cols-1 gap-16 md:grid-cols-2 md:gap-10 lg:gap-14">
+              {filteredConcepts.map((project, i) => (
+                <ProjectCard
+                  key={project.slug}
+                  project={project}
+                  index={filteredClients.length + i}
                 />
-              </MediaReveal>
-              <div className="mt-6 flex items-start justify-between gap-6">
-                <div>
-                  <h2 className="text-2xl font-medium tracking-tight text-offwhite transition-colors duration-300 group-hover:text-lime sm:text-3xl">
-                    {project.title}
-                  </h2>
-                  <div className="mt-2 flex flex-wrap items-center gap-3">
-                    <p className="label">{project.category}</p>
-                    {project.status === "concept" ? (
-                      <span className="label border border-white/12 px-2 py-0.5 text-offwhite/50">
-                        STUDIO CONCEPT
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-                <p className="label mt-1">{project.year}</p>
-              </div>
-            </Link>
-          </article>
-        ))}
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
