@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { getNextProject, getProject, projects } from "@/data/projects";
+import { ogDefaults, twitterDefaults } from "@/data/siteContent";
 import MediaReveal from "@/components/motion/MediaReveal";
 
 interface CaseStudyPageProps {
@@ -20,10 +21,23 @@ export async function generateMetadata({
   const { slug } = await params;
   const project = getProject(slug);
   if (!project) return { title: "Work" };
+  const title = project.title;
+  const description = project.summary;
   return {
-    title: project.title,
-    description: project.summary,
+    title,
+    description,
     alternates: { canonical: `/work/${project.slug}` },
+    openGraph: {
+      ...ogDefaults,
+      title,
+      description,
+      url: `/work/${project.slug}`,
+    },
+    twitter: {
+      ...twitterDefaults,
+      title,
+      description,
+    },
   };
 }
 
