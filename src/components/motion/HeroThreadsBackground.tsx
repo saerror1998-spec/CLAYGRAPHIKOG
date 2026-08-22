@@ -1,21 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
-import { Renderer, Program, Mesh, Triangle } from "ogl";
 import { usePrefersReducedMotion } from "@/lib/prefers-reduced-motion";
 
 /* ------------------------------------------------------------------ */
-/*  GLSL — procedural flowing threads                                  */
+/*  GLSL — procedural flowing threads (raw WebGL)                      */
 /* ------------------------------------------------------------------ */
 
-const VERT = `#version 300 es
-in vec2 position;
+const VERT = `
+attribute vec2 a_position;
 void main() {
-  gl_Position = vec4(position, 0.0, 1.0);
+  gl_Position = vec4(a_position, 0.0, 1.0);
 }
 `;
 
-const FRAG = `#version 300 es
+const FRAG = `
 precision highp float;
 
 uniform float uTime;
@@ -24,14 +23,11 @@ uniform vec2 uMouse;
 uniform float uAmplitude;
 uniform float uDistance;
 uniform vec3 uColor;
-uniform float uOpacity;
 
-// Simple hash for pseudo-random per-thread variation
 float hash(float n) {
   return fract(sin(n) * 43758.5453123);
 }
 
-// Smooth noise
 float noise(float x) {
   float i = floor(x);
   float f = fract(x);
@@ -40,9 +36,8 @@ float noise(float x) {
   return mix(a, b, f * f * (3.0 - 2.0 * f));
 }
 
-// Thread wave function — each thread has unique phase/speed/amplitude
 float threadWave(float x, float threadId, float time) {
-  float phase = threadId * 1.618; // golden ratio offset
+  float phase = threadId * 1.618;
   float speed = 0.3 + hash(threadId) * 0.4;
   float freq = 0.8 + hash(threadId + 100.0) * 0.6;
   float amp = uAmplitude * (0.6 + hash(threadId + 200.0) * 0.4);
@@ -57,57 +52,74 @@ float threadWave(float x, float threadId, float time) {
 void main() {
   vec2 uv = gl_FragCoord.xy / uResolution;
   float aspect = uResolution.x / uResolution.y;
-
-  // Normalized coordinates
   float x = uv.x * aspect;
   float y = uv.y;
 
-  // Mouse influence — subtle displacement
   float mx = uMouse.x * aspect;
   float my = uMouse.y;
   float mouseDist = length(vec2(x, y) - vec2(mx, my));
   float mouseInfluence = uDistance * exp(-mouseDist * 2.5) * 0.5;
 
-  // Accumulate thread contributions
   float threads = 0.0;
   float totalThreads = 16.0;
 
   for (float i = 0.0; i < 16.0; i++) {
-    // Thread vertical position — spread across hero
     float threadY = 0.08 + (i / totalThreads) * 0.84;
-
-    // Thread wave
     float wave = threadWave(x, i, uTime);
-
-    // Mouse displacement
     wave += mouseInfluence * sin(i * 0.5 + uTime);
-
-    // Distance from this thread's center
     float dist = abs(y - (threadY + wave));
 
-    // Thread thickness — very thin, with depth variation
-    float thickness = 0.0015 + hash(i + 300.0) * 0.001;
-
-    // Brightness — sharp falloff from thread center
+    float thickness = 0.002 + hash(i + 300.0) * 0.0015;
     float brightness = smoothstep(thickness, 0.0, dist);
-
-    // Depth layer — threads further back are dimmer
-    float depth = 0.3 + hash(i + 400.0) * 0.7;
+    float depth = 0.35 + hash(i + 400.0) * 0.65;
     brightness *= depth;
 
     threads += brightness;
   }
 
-  // Clamp and apply color
   threads = clamp(threads, 0.0, 1.0);
-
-  // Output: lime threads on transparent background
   vec3 color = uColor * threads;
-  float alpha = threads * uOpacity;
+  float alpha = threads * 0.75;
 
   gl_FragColor = vec4(color, alpha);
 }
 `;
+
+/* ------------------------------------------------------------------ */
+/*  WebGL helpers                                                      */
+/* ------------------------------------------------------------------ */
+
+function compileShader(gl: WebGLRenderingContext, type: number, src: string) {
+  const shader = gl.createShader(type)!;
+  gl.shaderSource(shader, src);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    console.error("Shader compile error:", gl.getShaderInfoLog(shader));
+    gl.deleteShader(shader);
+    return null;
+  }
+  return shader;
+}
+
+function createProgram(
+  gl: WebGLRenderingContext,
+  vertSrc: string,
+  fragSrc: string,
+) {
+  const vs = compileShader(gl, gl.VERTEX_SHADER, vertSrc);
+  const fs = compileShader(gl, gl.FRAGMENT_SHADER, fragSrc);
+  if (!vs || !fs) return null;
+
+  const prog = gl.createProgram()!;
+  gl.attachShader(prog, vs);
+  gl.attachShader(prog, fs);
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+    console.error("Program link error:", gl.getProgramInfoLog(prog));
+    return null;
+  }
+  return prog;
+}
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
@@ -115,7 +127,6 @@ void main() {
 
 interface HeroThreadsBackgroundProps {
   className?: string;
-  /** Pause animation when offscreen. @default true */
   pauseOffscreen?: boolean;
 }
 
@@ -123,121 +134,159 @@ export default function HeroThreadsBackground({
   className = "",
   pauseOffscreen = true,
 }: HeroThreadsBackgroundProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const reduced = usePrefersReducedMotion();
-  const rafRef = useRef(0);
-  const pausedRef = useRef(false);
-  const hiddenRef = useRef(false);
   const mouseRef = useRef({ x: 0.5, y: 0.5 });
-  const startTimeRef = useRef(0);
 
-  /* ---- Mouse tracking (passive, no pointer capture). */
   const onMouseMove = useCallback((e: MouseEvent) => {
-    if (!canvasRef.current) return;
-    const rect = canvasRef.current.getBoundingClientRect();
+    if (!wrapRef.current) return;
+    const rect = wrapRef.current.getBoundingClientRect();
     mouseRef.current = {
       x: (e.clientX - rect.left) / rect.width,
-      y: 1.0 - (e.clientY - rect.top) / rect.height, // flip Y for GL
+      y: 1.0 - (e.clientY - rect.top) / rect.height,
     };
   }, []);
 
-  /* ---- Main effect. */
   useEffect(() => {
-    if (reduced) return;
+    const ctn = wrapRef.current;
+    if (!ctn || reduced) return;
 
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    /* Create canvas and append to container (matching Aurora pattern). */
+    const canvas = document.createElement("canvas");
+    canvas.style.pointerEvents = "none";
+    canvas.setAttribute("aria-hidden", "true");
+    ctn.appendChild(canvas);
 
-    /* Renderer */
-    const renderer = new Renderer({
-      canvas,
+    const dpr = Math.min(window.devicePixelRatio, 1.5);
+    const gl = canvas.getContext("webgl", {
       alpha: true,
-      premultipliedAlpha: false,
+      premultipliedAlpha: true,
       antialias: false,
-      dpr: Math.min(window.devicePixelRatio, 1.5),
+      preserveDrawingBuffer: false,
     });
-    const gl = renderer.gl;
+    if (!gl) {
+      ctn.removeChild(canvas);
+      return;
+    }
+
+    /* Enable blending for transparent output. */
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.clearColor(0, 0, 0, 0);
 
-    /* Program */
-    const program = new Program(gl, {
-      vertex: VERT,
-      fragment: FRAG,
-      uniforms: {
-        uTime: { value: 0 },
-        uResolution: { value: [canvas.width, canvas.height] },
-        uMouse: { value: [0.5, 0.5] },
-        uAmplitude: { value: 1.4 },
-        uDistance: { value: 0.4 },
-        uColor: { value: [0.8, 1.0, 0.0] }, // #CCFF00
-        uOpacity: { value: 0.35 },
-      },
-    });
+    /* Compile shaders. */
+    const program = createProgram(gl, VERT, FRAG);
+    if (!program) {
+      ctn.removeChild(canvas);
+      return;
+    }
+    gl.useProgram(program);
 
-    /* Fullscreen quad */
-    const geo = new Triangle(gl);
-    const mesh = new Mesh(gl, { geometry: geo, program });
+    /* Fullscreen quad: two triangles. */
+    const posBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
+      gl.STATIC_DRAW,
+    );
+    const posLoc = gl.getAttribLocation(program, "a_position");
+    gl.enableVertexAttribArray(posLoc);
+    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
 
-    startTimeRef.current = performance.now() / 1000;
+    /* Uniform locations. */
+    const uTime = gl.getUniformLocation(program, "uTime");
+    const uResolution = gl.getUniformLocation(program, "uResolution");
+    const uMouse = gl.getUniformLocation(program, "uMouse");
+    const uAmplitude = gl.getUniformLocation(program, "uAmplitude");
+    const uDistance = gl.getUniformLocation(program, "uDistance");
+    const uColor = gl.getUniformLocation(program, "uColor");
 
     /* Resize handler. */
-    const onResize = () => {
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
-      const dpr = Math.min(window.devicePixelRatio, 1.5);
-      renderer.setSize(w, h);
-      program.uniforms.uResolution.value = [w * dpr, h * dpr];
+    const resize = () => {
+      const w = Math.max(1, Math.floor(ctn.offsetWidth));
+      const h = Math.max(1, Math.floor(ctn.offsetHeight));
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.uniform2f(uResolution, canvas.width, canvas.height);
     };
-    onResize();
-    window.addEventListener("resize", onResize);
+
+    const ro = new ResizeObserver(resize);
+    ro.observe(ctn);
+
+    /* Initial size. */
+    resize();
 
     /* Render loop. */
+    const startTime = performance.now() / 1000;
+    let visible = true;
+    let rafId = 0;
+
     const render = () => {
-      if (pausedRef.current || hiddenRef.current) {
-        rafRef.current = requestAnimationFrame(render);
-        return;
-      }
-      const t = performance.now() / 1000 - startTimeRef.current;
-      program.uniforms.uTime.value = t;
-      program.uniforms.uMouse.value = [mouseRef.current.x, mouseRef.current.y];
-      renderer.render({ scene: mesh });
-      rafRef.current = requestAnimationFrame(render);
+      rafId = 0;
+      if (!visible) return;
+
+      const t = performance.now() / 1000 - startTime;
+      gl.uniform1f(uTime, t);
+      gl.uniform2f(uMouse, mouseRef.current.x, mouseRef.current.y);
+      gl.uniform1f(uAmplitude, 1.4);
+      gl.uniform1f(uDistance, 0.4);
+      gl.uniform3f(uColor, 0.8, 1.0, 0.0);
+
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+      rafId = requestAnimationFrame(render);
     };
-    rafRef.current = requestAnimationFrame(render);
+
+    /* IntersectionObserver for offscreen pause. */
+    let observer: IntersectionObserver | null = null;
+    if (pauseOffscreen) {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          const wasVisible = visible;
+          visible = entry.isIntersecting;
+          if (visible && !wasVisible && rafId === 0) {
+            rafId = requestAnimationFrame(render);
+          }
+        },
+        { threshold: 0.02 },
+      );
+      observer.observe(ctn);
+    }
 
     /* Tab visibility. */
     const onVisChange = () => {
-      hiddenRef.current = document.hidden;
+      if (document.hidden) {
+        visible = false;
+      } else {
+        visible = true;
+        if (rafId === 0) rafId = requestAnimationFrame(render);
+      }
     };
     document.addEventListener("visibilitychange", onVisChange);
 
-    /* Mouse listener. */
+    /* Mouse. */
     window.addEventListener("mousemove", onMouseMove, { passive: true });
 
+    /* Start. */
+    rafId = requestAnimationFrame(render);
+
     return () => {
-      cancelAnimationFrame(rafRef.current);
-      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(rafId);
+      observer?.disconnect();
+      ro.disconnect();
       window.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("visibilitychange", onVisChange);
+      if (ctn && canvas.parentNode === ctn) {
+        ctn.removeChild(canvas);
+      }
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
-  }, [reduced, onMouseMove]);
-
-  /* ---- IntersectionObserver for offscreen pause. */
-  useEffect(() => {
-    if (!pauseOffscreen || reduced) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        pausedRef.current = !entry.isIntersecting;
-      },
-      { threshold: 0.05 },
-    );
-    observer.observe(canvas);
-    return () => observer.disconnect();
-  }, [pauseOffscreen, reduced]);
+  }, [reduced, pauseOffscreen, onMouseMove]);
 
   /* ---- Reduced motion: static dark background only. */
   if (reduced) {
@@ -245,10 +294,9 @@ export default function HeroThreadsBackground({
   }
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={`absolute inset-0 h-full w-full ${className}`}
-      style={{ pointerEvents: "none" }}
+    <div
+      ref={wrapRef}
+      className={`absolute inset-0 overflow-hidden ${className}`}
       aria-hidden="true"
     />
   );
