@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { notFound } from "next/navigation";import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import DiaHeroTextReveal from "@/components/motion/DiaHeroTextReveal";
+import HeroThreadsBackground from "@/components/motion/HeroThreadsBackground";
+
 import { getNextProject, getProject, projects } from "@/data/projects";
 import { ogDefaults, twitterDefaults } from "@/data/siteContent";
 import MediaReveal from "@/components/motion/MediaReveal";
@@ -57,7 +59,8 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
 
   return (
     <>
-      <div className="px-6 pt-32 sm:px-8 lg:px-10 lg:pt-44">
+      <div className="relative overflow-hidden px-6 pt-32 sm:px-8 lg:px-10 lg:pt-44">
+        <HeroThreadsBackground />
         <Link
           href="/work"
           className="group inline-flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-softgray transition-colors hover:text-lime"
@@ -70,7 +73,7 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
         </Link>
 
         <h1 className="mt-8 max-w-4xl text-[clamp(2.5rem,6.5vw,5.2rem)] font-semibold uppercase leading-[1.0] tracking-[-0.03em] text-offwhite">
-          {project.title}
+          <DiaHeroTextReveal>{project.title}</DiaHeroTextReveal>
         </h1>
         <div className="mt-8 flex flex-wrap items-center gap-6">
           <p className="label-lime">{project.category}</p>
