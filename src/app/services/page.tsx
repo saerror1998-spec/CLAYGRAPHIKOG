@@ -55,6 +55,13 @@ export default function ServicesPage() {
       />
 
       <div className="px-6 pb-24 sm:px-8 lg:px-10 lg:pb-32">
+        {/* Introductory context */}
+        <div className="border-t border-white/[0.08] py-16 lg:py-20">
+          <p className="max-w-3xl text-base leading-relaxed text-softgray sm:text-lg">
+            Clay Graphik offers four core services — each designed to work on its own or as part of a connected brand system. Based in Dubai, we work with businesses across the UAE and the GCC who need clear strategy, consistent design and digital execution they can rely on.
+          </p>
+        </div>
+
         {/* WHY IT MATTERS — problem-oriented context before the services */}
         <div className="border-t border-white/[0.08] py-16 lg:py-24">
           <p className="label text-offwhite/50">WHY IT MATTERS</p>

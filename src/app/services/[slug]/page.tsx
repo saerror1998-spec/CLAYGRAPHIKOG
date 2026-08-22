@@ -53,6 +53,10 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
     .map((p) => getProject(p))
     .filter((p): p is NonNullable<typeof p> => Boolean(p));
 
+  const relatedSvc = service.relatedServices
+    .map((s) => getService(s))
+    .filter((s): s is NonNullable<typeof s> => Boolean(s));
+
   return (
     <>
       <PageHero
@@ -63,8 +67,19 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
       />
 
       <div className="px-6 pb-24 sm:px-8 lg:px-10 lg:pb-32">
+        {/* WHAT THIS SERVICE COVERS */}
         <div className="grid grid-cols-1 gap-14 lg:grid-cols-12">
           <div className="lg:col-span-7">
+            <p className="label text-offwhite/50">WHAT THIS SERVICE COVERS</p>
+            <p className="mt-6 max-w-2xl text-base leading-relaxed text-softgray sm:text-lg">
+              {service.about}
+            </p>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-softgray sm:text-lg">
+              {service.problem}
+            </p>
+          </div>
+
+          <div className="lg:col-span-5">
             <p className="label text-offwhite/50">CAPABILITIES</p>
             <ul className="mt-6 space-y-1">
               {service.capabilities.map((cap, i) => (
@@ -80,47 +95,93 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
               ))}
             </ul>
           </div>
+        </div>
 
+        {/* WHAT WE DELIVER + HOW IT WORKS */}
+        <div className="mt-20 grid grid-cols-1 gap-14 lg:grid-cols-12">
           <div className="lg:col-span-5">
+            <p className="label text-offwhite/50">WHAT WE DELIVER</p>
+            <ul className="mt-6 space-y-4">
+              {service.deliverables.map((d) => (
+                <li key={d} className="flex items-start gap-3 text-base text-softgray">
+                  <span aria-hidden="true" className="mt-2 h-1 w-1 shrink-0 bg-lime" />
+                  {d}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="lg:col-span-7">
             <p className="label text-offwhite/50">HOW IT WORKS</p>
-            <p className="mt-6 max-w-sm text-base leading-relaxed text-softgray">
-              Every engagement starts with a conversation about the business,
-              the audience and the objective. The strategy, design and build
-              then follow a clear, documented process — so you always know
-              what is happening, why, and what comes next.
+            <p className="mt-6 max-w-2xl text-base leading-relaxed text-softgray sm:text-lg">
+              {service.process}
+            </p>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-softgray sm:text-lg">
+              {service.outcome}
             </p>
 
-            <StarBorder
-              as="div"
-              className="mt-10 inline-block"
-              style={{ padding: 0 }}
-            >
-              <LiquidButton
-                as={Link}
-                href={`/contact?service=${encodeURIComponent(service.title)}`}
-                className="inline-flex items-center gap-3 px-7 py-4 text-[11px] font-semibold uppercase tracking-[0.18em]"
+            <div className="mt-10 flex flex-wrap gap-4">
+              <StarBorder
+                as="div"
+                className="inline-block"
+                style={{ padding: 0 }}
               >
-                START A PROJECT
-                <ArrowUpRight
-                  aria-hidden="true"
-                  className="h-4 w-4"
-                />
-              </LiquidButton>
-            </StarBorder>
+                <LiquidButton
+                  as={Link}
+                  href={`/contact?service=${encodeURIComponent(service.title)}`}
+                  className="inline-flex items-center gap-3 px-7 py-4 text-[11px] font-semibold uppercase tracking-[0.18em]"
+                >
+                  START A PROJECT
+                  <ArrowUpRight
+                    aria-hidden="true"
+                    className="h-4 w-4"
+                  />
+                </LiquidButton>
+              </StarBorder>
 
-            <Link
-              href="/services"
-              className="group mt-8 inline-flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-softgray transition-colors hover:text-lime"
-            >
-              <ArrowLeft
-                aria-hidden="true"
-                className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5"
-              />
-              ALL SERVICES
-            </Link>
+              <Link
+                href="/services"
+                className="group inline-flex items-center gap-2 self-center text-[11px] font-medium uppercase tracking-[0.18em] text-softgray transition-colors hover:text-lime"
+              >
+                <ArrowLeft
+                  aria-hidden="true"
+                  className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5"
+                />
+                ALL SERVICES
+              </Link>
+            </div>
           </div>
         </div>
 
+        {/* RELATED SERVICES — contextual internal links */}
+        {relatedSvc.length ? (
+          <div className="mt-20 border-t border-white/[0.08] pt-12">
+            <p className="label text-offwhite/50">ALSO EXPLORE</p>
+            <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+              {relatedSvc.map((svc) => (
+                <Link
+                  key={svc.slug}
+                  href={`/services/${svc.slug}`}
+                  className="group flex items-center justify-between gap-6 border border-white/[0.08] bg-white/[0.02] p-7 transition-colors duration-300 hover:border-lime/40"
+                >
+                  <div>
+                    <p className="label text-lime">{svc.number}</p>
+                    <h3 className="mt-2 text-xl font-medium tracking-tight text-offwhite transition-colors duration-300 group-hover:text-lime">
+                      {svc.title}
+                    </h3>
+                    <p className="mt-2 text-sm text-softgray">{svc.positioning}</p>
+                  </div>
+                  <ArrowUpRight
+                    aria-hidden="true"
+                    className="h-5 w-5 shrink-0 text-softgray transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-lime"
+                  />
+                </Link>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {/* RELATED WORK */}
         {related.length ? (
           <div className="mt-20 border-t border-white/[0.08] pt-12">
             <p className="label text-offwhite/50">RELATED WORK</p>

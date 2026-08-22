@@ -210,13 +210,13 @@ export default function SignatureScroll() {
               <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#050505]/50">
                 0{i + 1}
               </p>
-              <h3
+              <h2
                 className={`mt-4 text-4xl font-semibold uppercase tracking-tight sm:text-5xl ${
                   s.lime ? "text-[#CCFF00]" : "text-[#050505]"
                 }`}
               >
                 {s.word}
-              </h3>
+              </h2>
               <p className="mt-3 max-w-md text-[#050505]/60">{s.copy}</p>
             </li>
           ))}
@@ -319,14 +319,14 @@ export default function SignatureScroll() {
               <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#050505]/50">
                 0{i + 1}
               </p>
-              <h3
+              <h2
                 data-mobile-word
                 className={`mt-4 text-4xl font-semibold uppercase tracking-tight sm:text-5xl ${
                   s.lime ? "text-[#CCFF00]" : "text-[#050505]"
                 }`}
               >
                 {s.word}
-              </h3>
+              </h2>
               <p data-mobile-copy className="mt-3 max-w-md text-[#050505]/60">
                 {s.copy}
               </p>

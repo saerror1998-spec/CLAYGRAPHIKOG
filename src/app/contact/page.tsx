@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import PageHero from "@/components/motion/PageHero";
 import ContactForm from "@/components/contact/ContactForm";
 import FAQ from "@/components/global/FAQ";
@@ -65,6 +66,11 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
           <div className="lg:col-span-4 lg:col-start-9">
             <div className="border border-white/[0.08] bg-white/[0.02] p-8 lg:p-10">
               <p className="label text-offwhite/50">DIRECT</p>
+              <p className="mt-4 max-w-sm text-sm leading-relaxed text-softgray">
+                Not sure what you need? View our
+                <Link href="/services" className="text-lime transition-colors hover:text-offwhite"> services</Link> to
+                find the right approach for your project.
+              </p>
               <ul className="mt-6 space-y-6">
                 {DIRECT.map((item) => (
                   <li key={item.label}>

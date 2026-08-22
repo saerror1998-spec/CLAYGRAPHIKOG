@@ -50,7 +50,10 @@ export default function AboutPage() {
             </p>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-softgray sm:text-lg">
               We work with founders, service businesses, startups and growing
-              brands across the UAE, GCC and beyond.
+              brands across the UAE, GCC and beyond. Explore our
+              <Link href="/services" className="text-lime transition-colors hover:text-offwhite"> services</Link> or see how that work
+              translates into results on our
+              <Link href="/work" className="text-lime transition-colors hover:text-offwhite"> work</Link> page.
             </p>
           </div>
 
@@ -138,7 +141,10 @@ export default function AboutPage() {
                 {ctas.startProject}
               </h3>
               <p className="mt-3 max-w-sm text-sm leading-relaxed text-softgray">
-                Based in {site.location}, serving the {site.serviceArea} markets.
+                Based in {site.location}, serving the {site.serviceArea} markets. See our
+              <Link href="/services" className="text-lime transition-colors hover:text-offwhite"> services</Link> or get in
+              touch through our
+              <Link href="/contact" className="text-lime transition-colors hover:text-offwhite"> contact</Link> page.
               </p>
               <StarBorder
                 as="div"

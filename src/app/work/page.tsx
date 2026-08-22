@@ -28,6 +28,11 @@ export default function WorkPage() {
         title="OUR WORK."
         support="A selection of branding, web and digital creative — built to be clear, credible and effective."
       />
+      <div className="px-6 pt-4 pb-16 sm:px-8 lg:px-10 lg:pt-6 lg:pb-20">
+        <p className="max-w-3xl text-base leading-relaxed text-softgray sm:text-lg">
+          Branding, website and content system projects from Clay Graphik — an independent creative studio based in Dubai, serving businesses across the UAE and GCC.
+        </p>
+      </div>
       <WorkGrid />
     </>
   );
